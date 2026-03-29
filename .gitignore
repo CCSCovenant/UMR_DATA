@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+preview_cache/
+editing_runs/
+uploads/
+data/annotations.jsonl
+data/runtime_settings.json
+.DS_Store
