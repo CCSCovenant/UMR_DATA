@@ -725,6 +725,10 @@ async function startEditingFoley() {
     setMessage(elements.editingMessage, "Editing Prompt 不能为空", "warn");
     return;
   }
+  if (!state.selectedVideo.video_id) {
+    setMessage(elements.editingMessage, "当前视频缺少 video_id，无法提交 Editing", "error");
+    return;
+  }
 
   state.loading.editing = true;
   elements.editingRunBtn.disabled = true;
@@ -738,7 +742,9 @@ async function startEditingFoley() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        video_id: state.selectedVideo.video_id,
         video_path: state.selectedVideo.absolute_path,
+        video_name: state.selectedVideo.relative_path,
         clip_start: clip.start,
         clip_end: clip.end,
         editing_start: editing.start,
