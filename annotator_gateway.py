@@ -8,7 +8,7 @@ import traceback
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from urllib import parse, request, error
 
 import server as core
@@ -63,8 +63,8 @@ def list_videos_with_id(root: Path) -> list[Dict[str, Any]]:
 def inference_request(
     method: str,
     path: str,
-    payload: Dict[str, Any] | None = None,
-    timeout: int | None = None,
+    payload: Optional[Dict[str, Any]] = None,
+    timeout: Optional[int] = None,
 ) -> Dict[str, Any]:
     url = f"{INFER_BASE_URL}{path}"
     data = None

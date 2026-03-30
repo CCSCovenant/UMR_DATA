@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "umr-data"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+gateway = []
+inference = [
+    "loguru==0.7.3",
+    "torch==2.8.0+cu126",
+    "torchaudio==2.8.0+cu126",
+]
+all = [
+    "loguru==0.7.3",
+    "torch==2.8.0+cu126",
+    "torchaudio==2.8.0+cu126",
+]

@@ -1,0 +1,12 @@
+serverAddr = "42.194.147.109"
+serverPort = 7000
+
+auth.method = "token"
+auth.token = "1919810"
+
+[[proxies]]
+name = "umr-infer-8877"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8877
+remotePort = 18877
