@@ -6,3 +6,7 @@ uploads/
 data/annotations.jsonl
 data/runtime_settings.json
 .DS_Store
+logs/
+frp_client/frpc
+frp_client/frp.tar.gz
+frp_client/frp_0.61.1_linux_amd64/

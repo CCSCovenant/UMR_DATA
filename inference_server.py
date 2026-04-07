@@ -18,7 +18,11 @@ from urllib import parse
 import server as core
 
 
-INFER_ROOT = Path(os.environ.get("UMRM_INFER_VIDEO_ROOT", str(core.DEFAULT_VIDEO_ROOT))).resolve()
+INFER_ROOT = Path(
+    os.environ.get(
+        "UMRM_INFER_VIDEO_ROOT", "/data/cws/Project/UMRM/data/EGO/videos/full_scale"
+    )
+).resolve()
 INFER_HOST = os.environ.get("UMRM_INFER_HOST", "0.0.0.0")
 INFER_PORT = int(os.environ.get("UMRM_INFER_PORT", "8877"))
 INFER_TOKEN = os.environ.get("UMRM_INFER_TOKEN", "").strip()
@@ -72,8 +76,31 @@ def resolve_video_path(video_id: str) -> Path:
     refresh_video_index()
     with VIDEO_INDEX_LOCK:
         refreshed = VIDEO_INDEX.get(video_id, "")
+        fallback_matches = []
+        for candidate in VIDEO_INDEX.values():
+            candidate_path = Path(candidate)
+            candidate_str = str(candidate_path)
+            if candidate_path.name == video_id:
+                fallback_matches.append(candidate_str)
+                continue
+            if candidate_str == video_id:
+                fallback_matches.append(candidate_str)
+                continue
+            try:
+                rel = str(candidate_path.relative_to(INFER_ROOT)).replace("\\", "/")
+                if rel == video_id:
+                    fallback_matches.append(candidate_str)
+            except Exception:
+                continue
     if not refreshed:
-        raise FileNotFoundError(f"Video not found by video_id: {video_id}")
+        if len(fallback_matches) == 1:
+            refreshed = fallback_matches[0]
+        elif len(fallback_matches) > 1:
+            raise FileNotFoundError(
+                f"Multiple videos match input: {video_id}. Please use video_id from /api/infer/videos."
+            )
+        else:
+            raise FileNotFoundError(f"Video not found by video_id: {video_id}")
     resolved = Path(refreshed).resolve()
     if not resolved.exists():
         raise FileNotFoundError(f"Video path disappeared: {resolved}")
@@ -124,17 +151,17 @@ def mirror_worker_task(local_task_id: str, remote_task: Dict[str, Any]) -> None:
 
 
 def run_foley_task(task_id: str) -> None:
-    task = get_task(task_id)
-    source_video = resolve_video_path(task["video_id"])
-    prompt = task["editing_prompt"]
-    start_s = float(task["editing_start"])
-    end_s = float(task["editing_end"])
-    run_dir = Path(task["run_dir"]).resolve()
-    clip_path = run_dir / "editing_clip.mp4"
-    output_dir = run_dir / "foley_output"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     try:
+        task = get_task(task_id)
+        source_video = resolve_video_path(task["video_id"])
+        prompt = task["editing_prompt"]
+        start_s = float(task["editing_start"])
+        end_s = float(task["editing_end"])
+        run_dir = Path(task["run_dir"]).resolve()
+        clip_path = run_dir / "editing_clip.mp4"
+        output_dir = run_dir / "foley_output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
         update_task(task_id, status="clipping", started_at=utc_now_iso())
         core.clip_video_segment(source_video, clip_path, start_s, end_s)
 

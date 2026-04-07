@@ -55,6 +55,11 @@ DEFAULT_FOLEY_FFMPEG = Path(
 FOLEY_WORKER_SCRIPT = BASE_DIR / "foley_worker.py"
 FOLEY_WORKER_HOST = os.environ.get("UMRM_FOLEY_WORKER_HOST", "127.0.0.1")
 FOLEY_WORKER_PORT = int(os.environ.get("UMRM_FOLEY_WORKER_PORT", "8766"))
+KEEP_FOLEY_WORKER = os.environ.get("UMRM_KEEP_FOLEY_WORKER", "1").strip().lower() not in {
+    "0",
+    "false",
+    "no",
+}
 
 EDITING_TASKS: Dict[str, Dict[str, Any]] = {}
 EDITING_TASKS_LOCK = threading.Lock()
@@ -477,6 +482,30 @@ def get_translation_config() -> Dict[str, str]:
 def get_foley_config() -> Dict[str, Any]:
     settings = load_runtime_settings()
     foley = settings["foley"]
+    worker_ports_raw = foley.get("worker_ports")
+    if worker_ports_raw is None:
+        worker_ports_raw = os.environ.get("UMRM_FOLEY_WORKER_PORTS", "")
+    worker_ports: List[int] = []
+    if isinstance(worker_ports_raw, list):
+        for value in worker_ports_raw:
+            try:
+                worker_ports.append(int(value))
+            except (TypeError, ValueError):
+                continue
+    elif isinstance(worker_ports_raw, str) and worker_ports_raw.strip():
+        for chunk in worker_ports_raw.split(","):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            try:
+                worker_ports.append(int(chunk))
+            except ValueError:
+                continue
+    if not worker_ports:
+        worker_ports = [FOLEY_WORKER_PORT]
+    worker_ports = sorted({port for port in worker_ports if 1 <= int(port) <= 65535})
+    if not worker_ports:
+        worker_ports = [FOLEY_WORKER_PORT]
     return {
         "project_dir": str(foley.get("project_dir", DEFAULT_FOLEY_PROJECT_DIR)).strip(),
         "model_path": str(foley.get("model_path", DEFAULT_FOLEY_MODEL_PATH)).strip(),
@@ -486,6 +515,7 @@ def get_foley_config() -> Dict[str, Any]:
         "guidance_scale": float(foley.get("guidance_scale", 4.5)),
         "num_inference_steps": int(foley.get("num_inference_steps", 50)),
         "enable_offload": bool(foley.get("enable_offload", False)),
+        "worker_ports": worker_ports,
     }
 
 
@@ -611,10 +641,10 @@ def sanitize_filename(name: str) -> str:
 
 class FoleyWorkerManager:
     def __init__(self) -> None:
-        self.process: Optional[subprocess.Popen[str]] = None
-        self.signature: Optional[tuple] = None
+        self.workers: Dict[int, Dict[str, Any]] = {}
+        self.task_routes: Dict[str, int] = {}
+        self.rr_counter = 0
         self.lock = threading.Lock()
-        self.log_thread: Optional[threading.Thread] = None
 
     def _build_signature(self, foley_cfg: Dict[str, Any]) -> tuple:
         return (
@@ -626,13 +656,29 @@ class FoleyWorkerManager:
             bool(foley_cfg["enable_offload"]),
         )
 
-    def _reader(self, process: subprocess.Popen[str]) -> None:
+    def _get_ports(self, foley_cfg: Dict[str, Any]) -> List[int]:
+        ports = foley_cfg.get("worker_ports") or [FOLEY_WORKER_PORT]
+        normalized = sorted({int(port) for port in ports})
+        return normalized or [FOLEY_WORKER_PORT]
+
+    def _state_for_port_locked(self, port: int) -> Dict[str, Any]:
+        state = self.workers.get(port)
+        if state is None:
+            state = {
+                "process": None,
+                "signature": None,
+                "log_thread": None,
+            }
+            self.workers[port] = state
+        return state
+
+    def _reader(self, process: subprocess.Popen[str], port: int) -> None:
         if process.stdout is None:
             return
         for line in process.stdout:
             text = line.rstrip()
             if text:
-                sys.stderr.write(f"[FOLEY_WORKER] {text}\n")
+                sys.stderr.write(f"[FOLEY_WORKER:{port}] {text}\n")
 
     def _health_matches(self, payload: Dict[str, Any], foley_cfg: Dict[str, Any]) -> bool:
         return (
@@ -643,22 +689,25 @@ class FoleyWorkerManager:
             and bool(payload.get("enable_offload", False)) == bool(foley_cfg["enable_offload"])
         )
 
-    def _stop_locked(self) -> None:
-        if self.process is None:
+    def _stop_locked(self, port: int) -> None:
+        state = self._state_for_port_locked(port)
+        process = state.get("process")
+        if process is None:
             return
-        if self.process.poll() is None:
-            self.process.terminate()
+        if process.poll() is None:
+            process.terminate()
             try:
-                self.process.wait(timeout=10)
+                process.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                self.process.kill()
-                self.process.wait(timeout=5)
-        self.process = None
-        self.signature = None
+                process.kill()
+                process.wait(timeout=5)
+        state["process"] = None
+        state["signature"] = None
 
-    def _start_locked(self, foley_cfg: Dict[str, Any]) -> None:
+    def _start_locked(self, foley_cfg: Dict[str, Any], port: int) -> None:
         if not FOLEY_WORKER_SCRIPT.exists():
             raise FileNotFoundError(f"Foley worker script not found: {FOLEY_WORKER_SCRIPT}")
+        state = self._state_for_port_locked(port)
 
         command = [
             "conda",
@@ -670,7 +719,7 @@ class FoleyWorkerManager:
             "--host",
             FOLEY_WORKER_HOST,
             "--port",
-            str(FOLEY_WORKER_PORT),
+            str(port),
             "--project-dir",
             foley_cfg["project_dir"],
             "--model-path",
@@ -685,7 +734,18 @@ class FoleyWorkerManager:
 
         env = os.environ.copy()
         env["PYTHONUNBUFFERED"] = "1"
-        self.process = subprocess.Popen(
+        for proxy_key in (
+            "http_proxy",
+            "https_proxy",
+            "HTTP_PROXY",
+            "HTTPS_PROXY",
+            "all_proxy",
+            "ALL_PROXY",
+        ):
+            env.pop(proxy_key, None)
+        env["NO_PROXY"] = "*"
+        env["no_proxy"] = "*"
+        process = subprocess.Popen(
             command,
             cwd=str(BASE_DIR),
             stdout=subprocess.PIPE,
@@ -694,52 +754,131 @@ class FoleyWorkerManager:
             bufsize=1,
             env=env,
         )
-        self.signature = self._build_signature(foley_cfg)
-        self.log_thread = threading.Thread(
-            target=self._reader, args=(self.process,), daemon=True
+        state["process"] = process
+        state["signature"] = self._build_signature(foley_cfg)
+        log_thread = threading.Thread(
+            target=self._reader, args=(process, port), daemon=True
         )
-        self.log_thread.start()
-        self._wait_until_ready_locked()
+        state["log_thread"] = log_thread
+        log_thread.start()
+        self._wait_until_ready_locked(port)
 
-    def _wait_until_ready_locked(self, timeout_s: float = 60.0) -> None:
+    def _request_to_port(
+        self,
+        method: str,
+        path: str,
+        payload: Optional[Dict[str, Any]],
+        timeout: int,
+        port: int,
+    ) -> Dict[str, Any]:
+        url = f"http://{FOLEY_WORKER_HOST}:{port}{path}"
+        data = None
+        headers = {}
+        if payload is not None:
+            data = json.dumps(payload).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+        req = request.Request(url, data=data, headers=headers, method=method)
+        opener = request.build_opener(request.ProxyHandler({}))
+        try:
+            with opener.open(req, timeout=timeout) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Foley worker error {exc.code} on {port}: {detail}") from exc
+        except error.URLError as exc:
+            raise RuntimeError(f"Cannot reach Foley worker {port}: {exc.reason}") from exc
+
+    def _wait_until_ready_locked(self, port: int, timeout_s: float = 60.0) -> None:
         deadline = time.time() + timeout_s
         last_error = ""
+        state = self._state_for_port_locked(port)
         while time.time() < deadline:
-            if self.process is not None and self.process.poll() is not None:
-                raise RuntimeError("Foley worker exited during startup.")
+            process = state.get("process")
+            if process is not None and process.poll() is not None:
+                raise RuntimeError(f"Foley worker {port} exited during startup.")
             try:
-                payload = self.request("GET", "/health", timeout=2, ensure_worker=False)
+                payload = self._request_to_port(
+                    "GET", "/health", payload=None, timeout=2, port=port
+                )
                 if payload.get("ok"):
                     return
             except Exception as exc:
                 last_error = str(exc)
             time.sleep(0.5)
-        raise RuntimeError(f"Foley worker did not become ready: {last_error}")
+        raise RuntimeError(f"Foley worker {port} did not become ready: {last_error}")
 
     def ensure_worker(self, foley_cfg: Dict[str, Any]) -> None:
         with self.lock:
+            ports = self._get_ports(foley_cfg)
             signature = self._build_signature(foley_cfg)
+            for port in ports:
+                state = self._state_for_port_locked(port)
+                try:
+                    health = self._request_to_port(
+                        "GET", "/health", payload=None, timeout=2, port=port
+                    )
+                    if health.get("ok") and self._health_matches(health, foley_cfg):
+                        state["signature"] = signature
+                        continue
+                    if health.get("ok") and KEEP_FOLEY_WORKER:
+                        state["signature"] = signature
+                        continue
+                    if health.get("ok"):
+                        try:
+                            self._request_to_port(
+                                "POST", "/shutdown", payload={}, timeout=2, port=port
+                            )
+                            time.sleep(1.0)
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+                process = state.get("process")
+                needs_restart = (
+                    process is None
+                    or process.poll() is not None
+                    or state.get("signature") != signature
+                )
+                if needs_restart:
+                    self._stop_locked(port)
+                    self._start_locked(foley_cfg, port)
+            stale_ports = [port for port in self.workers if port not in ports]
+            for stale_port in stale_ports:
+                self._stop_locked(stale_port)
+                self.workers.pop(stale_port, None)
+            self.task_routes = {
+                task_id: port
+                for task_id, port in self.task_routes.items()
+                if port in self.workers
+            }
+
+    def _select_run_port_locked(self, ports: List[int]) -> int:
+        healthy_idle: List[int] = []
+        healthy_busy: List[int] = []
+        for port in ports:
             try:
-                health = self.request("GET", "/health", timeout=2, ensure_worker=False)
-                if health.get("ok") and self._health_matches(health, foley_cfg):
-                    self.signature = signature
-                    return
-                if health.get("ok"):
-                    try:
-                        self.request("POST", "/shutdown", payload={}, timeout=2, ensure_worker=False)
-                        time.sleep(1.0)
-                    except Exception:
-                        pass
+                payload = self._request_to_port(
+                    "GET", "/health", payload=None, timeout=2, port=port
+                )
+                if not payload.get("ok"):
+                    continue
+                if payload.get("busy"):
+                    healthy_busy.append(port)
+                else:
+                    healthy_idle.append(port)
             except Exception:
-                pass
-            needs_restart = (
-                self.process is None
-                or self.process.poll() is not None
-                or self.signature != signature
-            )
-            if needs_restart:
-                self._stop_locked()
-                self._start_locked(foley_cfg)
+                continue
+        candidates = healthy_idle or healthy_busy or ports
+        ordered = sorted(candidates)
+        selected = ordered[self.rr_counter % len(ordered)]
+        self.rr_counter += 1
+        return selected
+
+    def _extract_task_id(self, path: str) -> str:
+        parsed = parse.urlsplit(path)
+        query = parse.parse_qs(parsed.query)
+        value = query.get("id", [""])[0]
+        return str(value).strip()
 
     def request(
         self,
@@ -749,23 +888,60 @@ class FoleyWorkerManager:
         timeout: int = 10,
         ensure_worker: bool = True,
     ) -> Dict[str, Any]:
+        foley_cfg = get_foley_config()
         if ensure_worker:
-            self.ensure_worker(get_foley_config())
-        url = f"http://{FOLEY_WORKER_HOST}:{FOLEY_WORKER_PORT}{path}"
-        data = None
-        headers = {}
-        if payload is not None:
-            data = json.dumps(payload).encode("utf-8")
-            headers["Content-Type"] = "application/json"
-        req = request.Request(url, data=data, headers=headers, method=method)
-        try:
-            with request.urlopen(req, timeout=timeout) as resp:
-                return json.loads(resp.read().decode("utf-8"))
-        except error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"Foley worker error {exc.code}: {detail}") from exc
-        except error.URLError as exc:
-            raise RuntimeError(f"Cannot reach Foley worker: {exc.reason}") from exc
+            self.ensure_worker(foley_cfg)
+        ports = self._get_ports(foley_cfg)
+
+        if method == "POST" and path == "/shutdown":
+            last_response: Dict[str, Any] = {}
+            last_error = ""
+            for port in ports:
+                try:
+                    last_response = self._request_to_port(
+                        method, path, payload=payload, timeout=timeout, port=port
+                    )
+                except Exception as exc:
+                    last_error = str(exc)
+            if last_response:
+                return last_response
+            raise RuntimeError(last_error or "No Foley worker available for shutdown.")
+
+        if method == "GET" and path.startswith("/task"):
+            task_id = self._extract_task_id(path)
+            mapped_port = self.task_routes.get(task_id, -1)
+            if mapped_port in ports:
+                try:
+                    return self._request_to_port(
+                        method, path, payload=payload, timeout=timeout, port=mapped_port
+                    )
+                except Exception:
+                    self.task_routes.pop(task_id, None)
+            last_error = ""
+            for port in ports:
+                try:
+                    response = self._request_to_port(
+                        method, path, payload=payload, timeout=timeout, port=port
+                    )
+                    if task_id:
+                        self.task_routes[task_id] = port
+                    return response
+                except Exception as exc:
+                    last_error = str(exc)
+            raise RuntimeError(last_error or "Cannot locate task on any Foley worker.")
+
+        selected_port = ports[0]
+        if method == "POST" and path == "/run":
+            with self.lock:
+                selected_port = self._select_run_port_locked(ports)
+        response = self._request_to_port(
+            method, path, payload=payload, timeout=timeout, port=selected_port
+        )
+        if method == "POST" and path == "/run":
+            task_id = str((response.get("task") or {}).get("task_id", "")).strip()
+            if task_id:
+                self.task_routes[task_id] = selected_port
+        return response
 
 
 FOLEY_WORKER_MANAGER = FoleyWorkerManager()
