@@ -1,0 +1,58 @@
+nohup: ignoring input
+[01/Apr/2026 23:43:45] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:43:46] "GET /api/videos?root=/data/UMRM/data/EGO/videos/full_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:43:46] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:43:46] [video-transfer] start channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:43:46] [video-transfer] first-chunk channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=28 elapsed_ms=108.3 detail=mode=transcode
+[01/Apr/2026 23:43:46] [video-transfer] end channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=799 elapsed_ms=115.3 detail=mode=transcode outcome=completed
+[01/Apr/2026 23:43:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:43:56] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 23:43:56] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 23:43:56] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:43:56] [video-transfer] start channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:43:56] [video-transfer] first-chunk channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=28 elapsed_ms=111.7 detail=mode=transcode
+[01/Apr/2026 23:43:57] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 23:43:57] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 23:43:57] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:43:57] [video-transfer] start channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:43:57] [video-transfer] first-chunk channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=28 elapsed_ms=158.6 detail=mode=transcode
+[01/Apr/2026 23:44:00] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:44:15] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:44:26] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 23:44:26] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 23:44:26] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:44:26] [video-transfer] start channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:44:26] [video-transfer] first-chunk channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=28 elapsed_ms=152.6 detail=mode=transcode
+[01/Apr/2026 23:44:27] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 23:44:27] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 23:44:27] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:44:27] [video-transfer] start channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:44:27] [video-transfer] first-chunk channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=1254 elapsed_ms=207.4 detail=mode=transcode
+[01/Apr/2026 23:44:30] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:44:45] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[01/Apr/2026 23:44:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:44:47] [video-transfer] end channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=66790 elapsed_ms=51015.9 detail=mode=transcode outcome=client_disconnected
+[01/Apr/2026 23:45:21] [video-transfer] end channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 bytes=1254 elapsed_ms=55316.8 detail=mode=transcode outcome=client_disconnected
+[01/Apr/2026 23:45:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:45:57] [video-transfer] end channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=66790 elapsed_ms=120020.9 detail=mode=transcode outcome=client_disconnected
+[01/Apr/2026 23:46:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:46:56] [video-transfer] end channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=23260858 elapsed_ms=149857.1 detail=mode=transcode outcome=completed
+[01/Apr/2026 23:46:58] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 HTTP/1.1" 200 -
+[01/Apr/2026 23:46:58] [video-transfer] start channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[01/Apr/2026 23:46:58] [video-transfer] first-chunk channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=28 elapsed_ms=124.3 detail=mode=transcode
+[01/Apr/2026 23:47:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:48:31] [video-transfer] end channel=stream-low client=218.107.35.216 file=/data/UMRM/data/EGO/videos/full_scale/002c3b5c-ed86-4af3-99a1-4b497b7c8a86.mp4 bytes=2477282 elapsed_ms=92731.8 detail=mode=transcode outcome=client_disconnected
+[01/Apr/2026 23:48:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1730, in do_POST
+    raise ValueError("video_path 不能为空。")
+ValueError: video_path 不能为空。
+[01/Apr/2026 23:49:02] "POST /api/video-release HTTP/1.1" 400 -
+  File "/home/ubuntu/UMR_DATA/server.py", line 1730, in do_POST
+    raise ValueError("video_path 不能为空。")
+ValueError: video_path 不能为空。
+[01/Apr/2026 23:49:02] "POST /api/video-release HTTP/1.1" 400 -
+[01/Apr/2026 23:49:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:50:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 23:51:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -

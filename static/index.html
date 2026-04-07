@@ -13,7 +13,12 @@
           <p class="eyebrow">UMRM Labeling Workspace</p>
           <h1>视频片段标注台</h1>
         </div>
+        <div class="inline-row">
+          <input id="userNameInput" type="text" placeholder="输入用户名（无需密码）" />
+          <button id="applyUserBtn" type="button">进入</button>
+        </div>
         <div class="status-group">
+          <span class="pill" id="currentUserPill">用户: 未登录</span>
           <span class="pill" id="vlmStatus">VLM: 未配置</span>
           <span class="pill" id="translateStatus">翻译: 备用通道</span>
           <span class="pill" id="foleyStatus">Foley: 未检查</span>
@@ -39,60 +44,66 @@
       </section>
 
       <section class="settings-panel card">
-        <div class="section-header">
-          <h2>服务配置</h2>
-          <button id="saveSettingsBtn" type="button">保存配置</button>
-        </div>
-        <div class="settings-grid">
-          <label class="field">
-            <span>VLM Base URL</span>
-            <input id="vlmApiBaseInput" type="text" placeholder="https://.../v1" />
-          </label>
-          <label class="field">
-            <span>VLM Model</span>
-            <input id="vlmModelInput" type="text" placeholder="例如 gemini-2.5-pro / gpt-4.1" />
-          </label>
-          <label class="field">
-            <span>VLM API Key</span>
-            <input id="vlmApiKeyInput" type="password" placeholder="留空则保留现有 key" />
-          </label>
-          <label class="field">
-            <span>Foley Conda 环境</span>
-            <input id="foleyCondaEnvInput" type="text" />
-          </label>
-          <label class="field">
-            <span>Foley 项目目录</span>
-            <input id="foleyProjectDirInput" type="text" />
-          </label>
-          <label class="field">
-            <span>Foley 模型目录</span>
-            <input id="foleyModelPathInput" type="text" />
-          </label>
-          <label class="field">
-            <span>Foley GPU ID</span>
-            <input id="foleyGpuIdInput" type="number" min="0" step="1" value="0" />
-          </label>
-          <label class="field">
-            <span>Foley Model Size</span>
-            <select id="foleyModelSizeInput">
-              <option value="xl">xl</option>
-              <option value="xxl">xxl</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Guidance Scale</span>
-            <input id="foleyGuidanceInput" type="number" step="0.1" />
-          </label>
-          <label class="field">
-            <span>Inference Steps</span>
-            <input id="foleyStepsInput" type="number" step="1" />
-          </label>
-        </div>
-        <div class="inline-row compact">
-          <label><input id="foleyOffloadInput" type="checkbox" /> Foley 启用 Offload</label>
-          <span class="video-path" id="vlmKeyHint">VLM key: 未设置</span>
-        </div>
-        <div class="message" id="settingsMessage"></div>
+        <details class="settings-details">
+          <summary>服务配置</summary>
+          <div class="settings-content">
+            <div class="section-header">
+              <h2>配置项</h2>
+              <button id="saveSettingsBtn" type="button">保存配置</button>
+            </div>
+            <div class="settings-grid">
+              <label class="field">
+                <span>VLM Base URL</span>
+                <input id="vlmApiBaseInput" type="text" placeholder="https://.../v1" />
+              </label>
+              <label class="field">
+                <span>VLM Model</span>
+                <input id="vlmModelInput" type="text" placeholder="例如 gemini-2.5-pro / gpt-4.1" />
+              </label>
+              <label class="field">
+                <span>VLM API Key</span>
+                <input id="vlmApiKeyInput" type="password" placeholder="留空则保留现有 key" />
+              </label>
+              <label class="field">
+                <span>Foley Conda 环境</span>
+                <input id="foleyCondaEnvInput" type="text" />
+              </label>
+              <label class="field">
+                <span>Foley 项目目录</span>
+                <input id="foleyProjectDirInput" type="text" />
+              </label>
+              <label class="field">
+                <span>Foley 模型目录</span>
+                <input id="foleyModelPathInput" type="text" />
+              </label>
+              <label class="field">
+                <span>Foley GPU ID</span>
+                <input id="foleyGpuIdInput" type="number" min="0" step="1" value="0" />
+              </label>
+              <label class="field">
+                <span>Foley Model Size</span>
+                <select id="foleyModelSizeInput">
+                  <option value="xl">xl</option>
+                  <option value="xxl">xxl</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Guidance Scale</span>
+                <input id="foleyGuidanceInput" type="number" step="0.1" />
+              </label>
+              <label class="field">
+                <span>Inference Steps</span>
+                <input id="foleyStepsInput" type="number" step="1" />
+              </label>
+            </div>
+            <div class="inline-row compact">
+              <label><input id="vlmTranslateToZhInput" type="checkbox" /> VLM 输出中文</label>
+              <label><input id="foleyOffloadInput" type="checkbox" /> Foley 启用 Offload</label>
+              <span class="video-path" id="vlmKeyHint">VLM key: 未设置</span>
+            </div>
+            <div class="message" id="settingsMessage"></div>
+          </div>
+        </details>
       </section>
 
       <main class="layout">
@@ -111,7 +122,7 @@
               <p id="selectedVideoMeta">请选择左侧视频</p>
             </div>
             <button id="reloadAnnotationsBtn" type="button" class="ghost-btn">
-              刷新最近保存
+              刷新当前视频片段
             </button>
           </div>
 
@@ -145,14 +156,17 @@
             <div class="clip-card">
               <div class="section-header small">
                 <h3>翻译工具</h3>
-                <button id="translateBtn" type="button">中文转英文</button>
+                <div class="inline-row compact">
+                  <button id="translateBtn" type="button">中文转英文</button>
+                  <button id="translateToZhBtn" type="button" class="ghost-btn">英文转中文</button>
+                </div>
               </div>
               <label class="field">
-                <span>中文输入</span>
-                <textarea id="translateSource" rows="4" placeholder="输入要翻译的中文"></textarea>
+                <span>源输入</span>
+                <textarea id="translateSource" rows="4" placeholder="输入待翻译内容"></textarea>
               </label>
               <label class="field">
-                <span>英文结果</span>
+                <span>翻译结果</span>
                 <textarea id="translateResult" rows="4" placeholder="翻译结果会显示在这里"></textarea>
               </label>
               <div class="inline-row compact">
@@ -165,6 +179,9 @@
                 <button type="button" class="ghost-btn fill-translate" data-target="motionPromptInput">
                   填入 Motion Prompt
                 </button>
+                <button type="button" class="ghost-btn fill-translate" data-target="mentalReasoningInput">
+                  填入 Mental Reasoning
+                </button>
               </div>
               <div class="message" id="translateMessage"></div>
             </div>
@@ -173,8 +190,22 @@
           <section class="annotation-form">
             <div class="section-header">
               <h2>标注表单</h2>
-              <button id="saveBtn" type="button">保存标注</button>
+              <div class="inline-row compact">
+                <button id="verifyBtn" type="button" class="ghost-btn">标记 Verified</button>
+                <button id="saveBtn" type="button">保存标注</button>
+              </div>
             </div>
+            <label class="field">
+              <span>标注保存路径（.json / .jsonl）</span>
+              <div class="inline-row">
+                <input
+                  id="annotationPathInput"
+                  type="text"
+                  placeholder="/home/ubuntu/UMR_DATA/data/annotations.jsonl"
+                />
+                <button id="rememberPathBtn" type="button" class="ghost-btn">记住路径</button>
+              </div>
+            </label>
 
             <div class="toggle-row">
               <label><input id="useVlmInput" type="checkbox" /> 使用 VLM 理解当前片段</label>
@@ -196,6 +227,15 @@
                 id="currentStateInput"
                 rows="5"
                 placeholder="填写当前视频片段对应的 current state"
+              ></textarea>
+            </label>
+
+            <label class="field">
+              <span>Mental Reasoning</span>
+              <textarea
+                id="mentalReasoningInput"
+                rows="5"
+                placeholder="结合视频、音频和 Current State，描述行为主体如何理解环境并据此做出动作选择"
               ></textarea>
             </label>
 
@@ -308,13 +348,23 @@
           </section>
         </section>
 
-        <aside class="recent card">
-          <div class="section-header">
-            <h2>最近保存</h2>
-            <span>最多 50 条</span>
-          </div>
-          <div class="recent-list" id="recentList"></div>
-        </aside>
+        <section class="right-panels">
+          <aside class="recent card">
+            <div class="section-header">
+              <h2>已标注视频</h2>
+              <span id="annotatedVideoCount">0 个</span>
+            </div>
+            <div class="recent-list" id="annotatedVideosList"></div>
+          </aside>
+
+          <aside class="recent card">
+            <div class="section-header">
+              <h2>当前视频标注信息</h2>
+              <span>片段列表</span>
+            </div>
+            <div class="recent-list" id="recentList"></div>
+          </aside>
+        </section>
       </main>
     </div>
 
@@ -329,10 +379,24 @@
       <article class="recent-item">
         <h3></h3>
         <p class="recent-meta"></p>
-        <p class="recent-text"></p>
+        <details class="segment-details">
+          <summary>标注内容预览</summary>
+          <pre class="recent-text"></pre>
+        </details>
+        <div class="inline-row compact">
+          <button type="button" class="ghost-btn recent-delete-btn">删除该片段</button>
+        </div>
       </article>
     </template>
 
+    <template id="annotatedVideoItemTemplate">
+      <button type="button" class="video-item annotated-video-item">
+        <strong class="video-name"></strong>
+        <span class="video-path"></span>
+      </button>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.18/dist/hls.min.js" defer></script>
     <script src="/app.js" defer></script>
   </body>
 </html>

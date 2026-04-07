@@ -53,10 +53,13 @@ def list_videos_with_id(root: Path) -> list[Dict[str, Any]]:
                     stat.st_mtime, tz=timezone.utc
                 ).isoformat(),
                 "media_url": core.media_url_for_path(path),
+                "hls_media_url": core.hls_url_for_path(path) if core.HLS_ENABLED else None,
+                "stream_media_url": core.low_stream_url_for_path(path),
                 "preview_media_url": core.preview_url_for_path(path),
                 "preview_cached": core.preview_cache_path(path).exists(),
             }
         )
+    core.apply_video_status_for_videos(videos)
     return videos
 
 
