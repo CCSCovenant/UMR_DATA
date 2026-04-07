@@ -1,0 +1,1055 @@
+nohup: ignoring input
+[01/Apr/2026 11:41:54] "GET /api/videos?root=/tmp HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1651, in do_POST
+    result = claim_video(video_path, video_relative_path, annotator_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/UMR_DATA/server.py", line 340, in claim_video
+    raise ValueError(f"该视频状态为 {status_value}，不可再次领取。")
+ValueError: 该视频状态为 verified，不可再次领取。
+[01/Apr/2026 11:41:54] "POST /api/video-claim HTTP/1.1" 400 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1651, in do_POST
+    result = claim_video(video_path, video_relative_path, annotator_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/UMR_DATA/server.py", line 340, in claim_video
+    raise ValueError(f"该视频状态为 {status_value}，不可再次领取。")
+ValueError: 该视频状态为 verified，不可再次领取。
+[01/Apr/2026 11:41:54] "POST /api/video-claim HTTP/1.1" 400 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1634, in do_POST
+    update_video_status(video_path, VIDEO_STATUS_COMPLETED_UNVERIFIED, annotator_id)
+  File "/home/ubuntu/UMR_DATA/server.py", line 405, in update_video_status
+    raise ValueError("仅领取者可将 claimed 更新为 completed_unverified。")
+ValueError: 仅领取者可将 claimed 更新为 completed_unverified。
+[01/Apr/2026 11:41:54] "POST /api/annotations HTTP/1.1" 400 -
+[01/Apr/2026 11:41:54] "POST /api/video-status HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] code 404, message Static file not found.
+[01/Apr/2026 11:43:35] "GET /favicon.ico HTTP/1.1" 404 -
+[01/Apr/2026 11:43:35] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:43:35] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:43:39] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:39] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:39] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:39] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:40] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:40] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:43:41] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18863)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:43:46] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:43:46] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:43:46] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:43:46] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:43:46] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:43:46] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:43:50] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:43:51] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:51] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:51] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:54] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:54] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:54] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:54] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:55] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:55] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:43:55] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18877)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:43:55] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:43:56] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18880)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:43:56] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:56] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:56] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:57] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:57] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:43:57] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18883)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:43:58] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:58] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:43:58] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:43:58] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:43:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:43:59] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18892)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:44:01] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:01] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:01] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:01] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:05] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:06] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:44:07] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:07] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:08] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:08] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:08] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:08] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:09] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:09] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:44:09] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18909)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:44:10] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:10] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:10] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:11] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:11] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:11] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:44:12] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18979)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:44:20] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:21] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:35] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:36] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:50] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:51] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:44:54] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:54] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:55] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:55] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:55] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:56] "POST /api/video-release HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:44:56] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18990)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:44:56] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:56] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:57] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:57] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:57] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:44:57] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 18993)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:44:58] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:58] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:59] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:44:59] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:44:59] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:44:59] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:44:59] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19000)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:45:00] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:45:00] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:45:00] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19003)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:45:00] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:45:00] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:45:00] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:45:01] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:45:02] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:45:02] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:45:02] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:45:02] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:45:02] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:45:05] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:06] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:20] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:21] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:35] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:36] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:50] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:45:51] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:05] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:06] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:20] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:21] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:46:21] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:46:21] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:46:22] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:46:22] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:22] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:46:24] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:24] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:25] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:25] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:25] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:25] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:25] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:46:25] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19098)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:46:25] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:46:27] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19101)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:46:27] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:29] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:29] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:29] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:29] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:32] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:37] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:46:40] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:40] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:42] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:42] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:42] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:42] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:42] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:43] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:43] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:43] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:46:44] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19124)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:46:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:51] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:51] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:51] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:52] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:52] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:52] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:52] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:54] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:46:54] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:54] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:55] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:46:55] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:46:56] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:46:56] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:46:56] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:56] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:46:57] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:46:58] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:46:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:46:58] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:01] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:02] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:06] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:07] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:11] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:12] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:16] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:17] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:20] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:47:21] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:47:21] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:21] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:22] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:47:22] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:47:22] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:22] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:47:22] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:47:22] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19228)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:47:23] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:25] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:26] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:29] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 11:47:29] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 11:47:29] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 11:47:29] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 11:47:29] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:30] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fannotations.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:47:30] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:30] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:47:30] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:30] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:31] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:47:31] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:47:31] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:31] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:47:31] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:47:31] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19246)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:47:32] "POST /api/video-release HTTP/1.1" 200 -
+[01/Apr/2026 11:47:32] "POST /api/video-claim HTTP/1.1" 200 -
+[01/Apr/2026 11:47:32] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 11:47:32] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[01/Apr/2026 11:47:34] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('218.107.35.216', 19252)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1573, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1772, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1578, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1800, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1790, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[01/Apr/2026 11:47:35] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:35] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:40] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:40] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:45] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:45] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:50] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:50] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:52] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:55] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:47:55] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:48:00] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:48:00] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -

@@ -2,10 +2,16 @@ const state = {
   config: null,
   videos: [],
   selectedVideo: null,
+  videoStatusByPath: {},
   clipDuration: 0,
   currentEditingTaskId: "",
   currentEditingResult: null,
   authToken: "",
+  annotatorId: "",
+  userName: "",
+  hlsPlayer: null,
+  videoDurationByPath: {},
+  claimHeartbeatTimer: null,
   loading: {
     videos: false,
     vlm: false,
@@ -23,8 +29,19 @@ state.authToken = urlToken || storedToken;
 if (urlToken) {
   window.localStorage.setItem("umrmSharedToken", urlToken);
 }
+const CLIP_MIN_DURATION = 2;
+const CLIP_MAX_DURATION = 15;
+const CLIP_DURATION_EPS = 1e-6;
+const ANNOTATION_PATH_STORAGE_PREFIX = "umrmAnnotationPath";
+const ANNOTATOR_ID_STORAGE_PREFIX = "umrmAnnotatorId";
+const USER_NAME_STORAGE_KEY = "umrmUserName";
+const VIDEO_STATUS_POLL_INTERVAL_MS = 15000;
+const CLAIM_HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000;
 
 const elements = {
+  userNameInput: document.querySelector("#userNameInput"),
+  applyUserBtn: document.querySelector("#applyUserBtn"),
+  currentUserPill: document.querySelector("#currentUserPill"),
   videoRootInput: document.querySelector("#videoRootInput"),
   refreshVideosBtn: document.querySelector("#refreshVideosBtn"),
   uploadInput: document.querySelector("#uploadInput"),
@@ -42,6 +59,7 @@ const elements = {
   foleyGuidanceInput: document.querySelector("#foleyGuidanceInput"),
   foleyStepsInput: document.querySelector("#foleyStepsInput"),
   foleyOffloadInput: document.querySelector("#foleyOffloadInput"),
+  vlmTranslateToZhInput: document.querySelector("#vlmTranslateToZhInput"),
   settingsMessage: document.querySelector("#settingsMessage"),
   vlmKeyHint: document.querySelector("#vlmKeyHint"),
   videoCount: document.querySelector("#videoCount"),
@@ -60,6 +78,7 @@ const elements = {
   runVlmBtn: document.querySelector("#runVlmBtn"),
   vlmPromptInput: document.querySelector("#vlmPromptInput"),
   currentStateInput: document.querySelector("#currentStateInput"),
+  mentalReasoningInput: document.querySelector("#mentalReasoningInput"),
   vlmSummaryOutput: document.querySelector("#vlmSummaryOutput"),
   useEditingInput: document.querySelector("#useEditingInput"),
   editingFields: document.querySelector("#editingFields"),
@@ -81,19 +100,26 @@ const elements = {
   reactionInput: document.querySelector("#reactionInput"),
   motionPromptInput: document.querySelector("#motionPromptInput"),
   notesInput: document.querySelector("#notesInput"),
+  annotationPathInput: document.querySelector("#annotationPathInput"),
+  rememberPathBtn: document.querySelector("#rememberPathBtn"),
+  verifyBtn: document.querySelector("#verifyBtn"),
   saveBtn: document.querySelector("#saveBtn"),
   saveMessage: document.querySelector("#saveMessage"),
   translateSource: document.querySelector("#translateSource"),
   translateResult: document.querySelector("#translateResult"),
   translateBtn: document.querySelector("#translateBtn"),
+  translateToZhBtn: document.querySelector("#translateToZhBtn"),
   translateMessage: document.querySelector("#translateMessage"),
   vlmStatus: document.querySelector("#vlmStatus"),
   translateStatus: document.querySelector("#translateStatus"),
   foleyStatus: document.querySelector("#foleyStatus"),
   reloadAnnotationsBtn: document.querySelector("#reloadAnnotationsBtn"),
   recentList: document.querySelector("#recentList"),
+  annotatedVideoCount: document.querySelector("#annotatedVideoCount"),
+  annotatedVideosList: document.querySelector("#annotatedVideosList"),
   videoItemTemplate: document.querySelector("#videoItemTemplate"),
   recentItemTemplate: document.querySelector("#recentItemTemplate"),
+  annotatedVideoItemTemplate: document.querySelector("#annotatedVideoItemTemplate"),
 };
 
 function setMessage(node, text, level = "") {
@@ -107,6 +133,35 @@ function withAuth(url) {
     resolved.searchParams.set("token", state.authToken);
   }
   return resolved.toString();
+}
+
+function getAnnotatorStorageKey() {
+  return `${ANNOTATOR_ID_STORAGE_PREFIX}:${state.authToken || "anonymous"}`;
+}
+
+function sanitizeUserName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[^A-Za-z0-9._:-]+/g, "_")
+    .slice(0, 80);
+}
+
+function setCurrentUser(nameValue) {
+  const normalized = sanitizeUserName(nameValue);
+  if (!normalized) {
+    throw new Error("请先输入有效用户名（仅支持字母数字._:-）");
+  }
+  state.userName = normalized;
+  state.annotatorId = normalized;
+  elements.userNameInput.value = normalized;
+  elements.currentUserPill.textContent = `用户: ${normalized}`;
+  window.localStorage.setItem(USER_NAME_STORAGE_KEY, normalized);
+  window.sessionStorage.setItem(getAnnotatorStorageKey(), normalized);
+}
+
+function ensureSignedIn() {
+  if (state.annotatorId) return;
+  throw new Error("请先输入用户名并点击进入");
 }
 
 function formatSeconds(value) {
@@ -128,6 +183,15 @@ function formatBytes(bytes) {
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
+function normalizePathKey(value) {
+  const raw = String(value || "").trim();
+  try {
+    return decodeURIComponent(raw).replace(/\\/g, "/");
+  } catch (_) {
+    return raw.replace(/\\/g, "/");
+  }
+}
+
 function formatElapsed(seconds) {
   if (!Number.isFinite(seconds) || seconds <= 0) return "--";
   const mins = Math.floor(seconds / 60);
@@ -136,9 +200,13 @@ function formatElapsed(seconds) {
 }
 
 async function fetchJson(url, options = {}) {
+  ensureSignedIn();
   const headers = new Headers(options.headers || {});
   if (state.authToken) {
     headers.set("X-UMRM-Token", state.authToken);
+  }
+  if (state.annotatorId) {
+    headers.set("X-UMRM-Annotator-ID", state.annotatorId);
   }
   const response = await fetch(withAuth(url), {
     ...options,
@@ -151,12 +219,112 @@ async function fetchJson(url, options = {}) {
   return payload;
 }
 
+function statusText(statusValue) {
+  const normalized = normalizeStatusValue(statusValue);
+  if (normalized === "claimed") return "claimed";
+  if (normalized === "completed_unverified") return "completed(unverified)";
+  if (normalized === "verified") return "verified";
+  return "unclaimed";
+}
+
+function normalizeStatusValue(statusValue) {
+  const raw = String(statusValue || "").trim().toLowerCase();
+  if (!raw) return "unclaimed";
+  if (raw === "completed(unverified)" || raw === "completed-unverified" || raw === "completed unverified") {
+    return "completed_unverified";
+  }
+  if (raw === "claimed" || raw === "completed_unverified" || raw === "verified" || raw === "unclaimed") {
+    return raw;
+  }
+  return "unclaimed";
+}
+
+function isClaimedByOther(statusEntry) {
+  if (!statusEntry) return false;
+  const owner = String(statusEntry.claimed_by || "").trim();
+  if (!owner) return false;
+  const hasLease =
+    Boolean(String(statusEntry.claim_expires_at || "").trim()) ||
+    normalizeStatusValue(statusEntry.status) === "claimed";
+  return hasLease && owner !== state.annotatorId;
+}
+
+function isClaimedByCurrentUser(statusEntry) {
+  if (!statusEntry) return false;
+  const owner = String(statusEntry.claimed_by || "").trim();
+  if (!owner || owner !== state.annotatorId) return false;
+  return (
+    Boolean(String(statusEntry.claim_expires_at || "").trim()) ||
+    normalizeStatusValue(statusEntry.status) === "claimed"
+  );
+}
+
+function getVideoStatus(videoPath) {
+  return normalizeStatusValue(state.videoStatusByPath[videoPath]?.status || "unclaimed");
+}
+
+function updateVideoStatusEntry(videoPath, statusEntry) {
+  if (!videoPath || !statusEntry) return;
+  const normalizedEntry = { ...statusEntry, status: normalizeStatusValue(statusEntry.status) };
+  state.videoStatusByPath[videoPath] = normalizedEntry;
+  const found = state.videos.find((item) => item.absolute_path === videoPath);
+  if (found) {
+    found.video_status = normalizedEntry;
+  }
+  if (state.selectedVideo?.absolute_path === videoPath) {
+    state.selectedVideo.video_status = normalizedEntry;
+  }
+}
+
+function resetClaimHeartbeat() {
+  if (state.claimHeartbeatTimer) {
+    window.clearInterval(state.claimHeartbeatTimer);
+    state.claimHeartbeatTimer = null;
+  }
+  if (!state.selectedVideo) return;
+  const statusEntry = state.videoStatusByPath[state.selectedVideo.absolute_path] || {};
+  if (!isClaimedByCurrentUser(statusEntry)) return;
+  state.claimHeartbeatTimer = window.setInterval(async () => {
+    try {
+      const payload = await fetchJson("/api/video-heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_path: state.selectedVideo.absolute_path }),
+      });
+      updateVideoStatusEntry(state.selectedVideo.absolute_path, payload.status_entry);
+      renderVideoList();
+    } catch (_) {
+    }
+  }, CLAIM_HEARTBEAT_INTERVAL_MS);
+}
+
+function getAnnotationPathStorageKey() {
+  return `${ANNOTATION_PATH_STORAGE_PREFIX}:${state.userName || "anonymous"}`;
+}
+
+function saveAnnotationPathPreference(pathValue) {
+  window.localStorage.setItem(getAnnotationPathStorageKey(), pathValue);
+}
+
+function getCurrentAnnotationPath() {
+  return elements.annotationPathInput.value.trim();
+}
+
+function getAnnotationPathOrThrow() {
+  const annotationPath = getCurrentAnnotationPath();
+  if (!annotationPath) {
+    throw new Error("请先填写标注保存路径（.json 或 .jsonl）");
+  }
+  return annotationPath;
+}
+
 function fillSettings(settings) {
   if (!settings) return;
   const { vlm = {}, foley = {} } = settings;
   elements.vlmApiBaseInput.value = vlm.api_base || "";
   elements.vlmModelInput.value = vlm.model || "";
   elements.vlmApiKeyInput.value = "";
+  elements.vlmTranslateToZhInput.checked = vlm.translate_to_zh !== false;
   elements.vlmKeyHint.textContent = vlm.api_key_set
     ? `VLM key: ${vlm.api_key_masked || "已设置"}`
     : "VLM key: 未设置";
@@ -175,6 +343,8 @@ async function loadConfig() {
   const config = await fetchJson("/api/config");
   state.config = config;
   elements.videoRootInput.value = config.default_video_root;
+  const storedAnnotationPath = window.localStorage.getItem(getAnnotationPathStorageKey()) || "";
+  elements.annotationPathInput.value = storedAnnotationPath || config.annotation_file || "";
   elements.vlmStatus.textContent = config.vlm_configured ? "VLM: 已配置" : "VLM: 待补 model";
   elements.translateStatus.textContent = config.translation_configured
     ? "翻译: LLM 已配置"
@@ -197,13 +367,36 @@ function renderVideoList() {
   state.videos.forEach((video) => {
     const node = elements.videoItemTemplate.content.firstElementChild.cloneNode(true);
     node.querySelector(".video-name").textContent = video.name;
+    const currentStatusEntry = video.video_status || state.videoStatusByPath[video.absolute_path] || {};
+    const currentStatus = currentStatusEntry.status || getVideoStatus(video.absolute_path);
+    const lockedByOther = isClaimedByOther(currentStatusEntry);
+    const ownerText = lockedByOther ? ` (${currentStatusEntry.claimed_by})` : "";
     node.querySelector(".video-path").textContent = `${video.relative_path} · ${formatBytes(
       video.size_bytes
-    )}`;
+    )} · 状态: ${statusText(currentStatus)}${ownerText}`;
+    node.disabled = lockedByOther;
+    if (lockedByOther) {
+      node.title = `已被 ${currentStatusEntry.claimed_by} 领取`;
+    }
     if (state.selectedVideo?.absolute_path === video.absolute_path) {
       node.classList.add("active");
     }
-    node.addEventListener("click", () => selectVideo(video));
+    node.addEventListener("click", async () => {
+      if (lockedByOther) {
+        setMessage(
+          elements.rootMessage,
+          `该视频已被 ${currentStatusEntry.claimed_by} 领取，暂时不可选`,
+          "warn"
+        );
+        return;
+      }
+      try {
+        await selectVideo(video);
+      } catch (error) {
+        setMessage(elements.rootMessage, error.message, "error");
+        await refreshVideoStatuses().catch(() => {});
+      }
+    });
     elements.videoList.appendChild(node);
   });
 }
@@ -216,6 +409,12 @@ async function loadVideos(rootOverride = "") {
     const root = rootOverride || elements.videoRootInput.value.trim();
     const payload = await fetchJson(`/api/videos?root=${encodeURIComponent(root)}`);
     state.videos = payload.videos;
+    state.videoStatusByPath = {};
+    state.videos.forEach((video) => {
+      if (video.video_status) {
+        state.videoStatusByPath[video.absolute_path] = video.video_status;
+      }
+    });
     elements.videoRootInput.value = payload.root;
     if (
       state.selectedVideo &&
@@ -223,8 +422,17 @@ async function loadVideos(rootOverride = "") {
     ) {
       state.selectedVideo = null;
       clearSelectedVideo();
+      resetClaimHeartbeat();
+    } else if (state.selectedVideo) {
+      const refreshed = state.videos.find(
+        (item) => item.absolute_path === state.selectedVideo.absolute_path
+      );
+      if (refreshed) {
+        state.selectedVideo = refreshed;
+      }
     }
     renderVideoList();
+    await loadAnnotatedVideos();
     setMessage(elements.rootMessage, `已读取 ${payload.videos.length} 个视频`, "ok");
   } catch (error) {
     setMessage(elements.rootMessage, error.message, "error");
@@ -237,32 +445,210 @@ async function loadVideos(rootOverride = "") {
 }
 
 function clearSelectedVideo() {
+  if (state.hlsPlayer) {
+    state.hlsPlayer.destroy();
+    state.hlsPlayer = null;
+  }
   elements.videoPlayer.removeAttribute("src");
   elements.videoPlayer.load();
   elements.selectedVideoMeta.textContent = "请选择左侧视频";
   elements.durationLabel.textContent = "总时长: --";
   state.clipDuration = 0;
+  state.selectedVideo = null;
 }
 
-function selectVideo(video) {
+function applyVideoDuration(durationSeconds, resetRanges = false, allowShrink = false) {
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    return false;
+  }
+  if (
+    !allowShrink &&
+    Number.isFinite(state.clipDuration) &&
+    state.clipDuration > 0 &&
+    durationSeconds + 0.2 < state.clipDuration
+  ) {
+    return false;
+  }
+  const nextDuration =
+    !allowShrink && Number.isFinite(state.clipDuration) && state.clipDuration > 0
+      ? Math.max(state.clipDuration, durationSeconds)
+      : durationSeconds;
+  state.clipDuration = nextDuration;
+  elements.durationLabel.textContent = `总时长: ${formatSeconds(nextDuration)}`;
+  if (resetRanges) {
+    elements.clipStartInput.value = "0.0";
+    elements.clipEndInput.value = Math.min(5, nextDuration || 5).toFixed(1);
+    elements.editingStartInput.value = elements.clipStartInput.value;
+    elements.editingEndInput.value = elements.clipEndInput.value;
+  } else {
+    const clipEnd = Number(elements.clipEndInput.value);
+    if (Number.isFinite(clipEnd) && clipEnd > nextDuration) {
+      elements.clipEndInput.value = nextDuration.toFixed(1);
+      elements.editingEndInput.value = elements.clipEndInput.value;
+    }
+  }
+  validateClipRange();
+  validateEditingRange();
+  return true;
+}
+
+async function ensureSelectedVideoDuration(video) {
+  if (!video?.absolute_path) return;
+  const cached = state.videoDurationByPath[video.absolute_path];
+  if (applyVideoDuration(cached, true)) {
+    return;
+  }
+  const payload = await fetchJson(`/api/video-metadata?path=${encodeURIComponent(video.absolute_path)}`);
+  const duration = Number(payload.duration_seconds);
+  if (!Number.isFinite(duration) || duration <= 0) return;
+  state.videoDurationByPath[video.absolute_path] = duration;
+  if (!state.selectedVideo || state.selectedVideo.absolute_path !== video.absolute_path) return;
+  applyVideoDuration(duration, true);
+}
+
+function playVideoSource(video) {
+  if (state.hlsPlayer) {
+    state.hlsPlayer.destroy();
+    state.hlsPlayer = null;
+  }
+  const fallbackUrl = withAuth(video.stream_media_url || video.preview_media_url || video.media_url);
+  const fallbackMode = video.stream_media_url ? "stream-low" : video.preview_cached ? "preview" : "media";
+  const hlsUrl = video.hls_media_url ? withAuth(video.hls_media_url) : "";
+  if (hlsUrl) {
+    if (window.Hls && window.Hls.isSupported()) {
+      const hls = new window.Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        xhrSetup: (xhr) => {
+          if (state.authToken) {
+            xhr.setRequestHeader("X-UMRM-Token", state.authToken);
+          }
+        },
+      });
+      state.hlsPlayer = hls;
+      hls.on(window.Hls.Events.ERROR, (_event, data) => {
+        if (!data?.fatal) return;
+        if (!state.selectedVideo || state.selectedVideo.absolute_path !== video.absolute_path) return;
+        hls.destroy();
+        if (state.hlsPlayer === hls) {
+          state.hlsPlayer = null;
+        }
+        elements.videoPlayer.src = fallbackUrl;
+        elements.videoPlayer.load();
+        setMessage(elements.rootMessage, "HLS 播放失败，已自动切换到低码率流", "warn");
+      });
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(elements.videoPlayer);
+      return "hls-js";
+    }
+    if (!state.authToken && elements.videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+      elements.videoPlayer.src = hlsUrl;
+      elements.videoPlayer.load();
+      return "hls-native";
+    }
+  }
+  elements.videoPlayer.src = fallbackUrl;
+  elements.videoPlayer.load();
+  return fallbackMode;
+}
+
+async function releaseCurrentVideoClaim() {
+  if (!state.selectedVideo?.absolute_path) return;
+  const statusEntry = state.videoStatusByPath[state.selectedVideo.absolute_path] || {};
+  if (!isClaimedByCurrentUser(statusEntry)) return;
+  try {
+    const payload = await fetchJson("/api/video-release", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ video_path: state.selectedVideo.absolute_path }),
+    });
+    updateVideoStatusEntry(state.selectedVideo.absolute_path, payload.status_entry);
+    renderVideoList();
+  } catch (_) {
+  }
+}
+
+function releaseCurrentVideoClaimSync() {
+  if (!state.selectedVideo?.absolute_path) return;
+  const statusEntry = state.videoStatusByPath[state.selectedVideo.absolute_path] || {};
+  if (!isClaimedByCurrentUser(statusEntry)) return;
+  const payload = JSON.stringify({
+    video_path: state.selectedVideo.absolute_path,
+    annotator_id: state.annotatorId,
+  });
+  const body = new Blob([payload], { type: "application/json" });
+  try {
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(withAuth("/api/video-release"), body);
+    }
+  } catch (_) {
+  }
+}
+
+async function refreshVideoStatuses() {
+  const root = elements.videoRootInput.value.trim();
+  const payload = await fetchJson(`/api/video-statuses?root=${encodeURIComponent(root)}`);
+  Object.entries(payload.statuses || {}).forEach(([videoPath, statusEntry]) => {
+    updateVideoStatusEntry(videoPath, statusEntry);
+  });
+  if (state.selectedVideo?.absolute_path) {
+    const selectedStatus = state.videoStatusByPath[state.selectedVideo.absolute_path];
+    if (isClaimedByOther(selectedStatus)) {
+      clearSelectedVideo();
+      resetClaimHeartbeat();
+      setMessage(elements.rootMessage, `当前片段已被 ${selectedStatus.claimed_by} 接管，已自动取消选中`, "warn");
+    }
+  }
+  resetClaimHeartbeat();
+  renderVideoList();
+}
+
+async function claimVideoOrThrow(video) {
+  const payload = await fetchJson("/api/video-claim", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      video_path: video.absolute_path,
+      video_relative_path: video.relative_path,
+    }),
+  });
+  updateVideoStatusEntry(video.absolute_path, payload.status_entry);
+  renderVideoList();
+}
+
+async function selectVideo(video) {
+  if (
+    state.selectedVideo?.absolute_path &&
+    state.selectedVideo.absolute_path !== video.absolute_path
+  ) {
+    await releaseCurrentVideoClaim();
+  }
+  await claimVideoOrThrow(video);
   state.selectedVideo = video;
   renderVideoList();
-  elements.videoPlayer.src = withAuth(video.preview_media_url || video.media_url);
-  elements.videoPlayer.load();
+  elements.durationLabel.textContent = "总时长: 读取中...";
+  const playbackMode = playVideoSource(video);
+  ensureSelectedVideoDuration(video).catch(() => {});
   elements.selectedVideoMeta.textContent = `${video.relative_path} · ${formatBytes(video.size_bytes)}`;
   state.currentEditingTaskId = "";
   state.currentEditingResult = null;
   state.loading.editing = false;
   elements.editingRunBtn.disabled = false;
   resetEditingOutputs();
-  setMessage(
-    elements.rootMessage,
-    video.preview_cached
-      ? "已切到轻量预览缓存，远程查看会更顺滑"
-      : "首次打开这个视频会先在服务器生成轻量预览缓存，之后会更顺滑",
-    video.preview_cached ? "ok" : "warn"
-  );
+  const playbackMsg = playbackMode.startsWith("hls")
+    ? "已启用 HLS 分段播放，边下边播更稳定"
+    : playbackMode === "stream-low"
+      ? "已启用低码率流式播放，首帧加载更快"
+      : video.preview_cached
+        ? "已切到轻量预览缓存，远程查看会更顺滑"
+        : "首次打开这个视频会先在服务器生成轻量预览缓存，之后会更顺滑";
+  const playbackLevel =
+    playbackMode.startsWith("hls") || playbackMode === "stream-low" || video.preview_cached ? "ok" : "warn";
+  setMessage(elements.rootMessage, playbackMsg, playbackLevel);
   setMessage(elements.saveMessage, "");
+  await loadCurrentVideoAnnotations();
+  await loadAnnotatedVideos();
+  resetClaimHeartbeat();
 }
 
 function getClipRange() {
@@ -295,13 +681,17 @@ function validateClipRange() {
     setMessage(elements.clipValidationMessage, "结束时间不能超过视频总时长", "error");
     return false;
   }
-  if (duration < 3 || duration > 15) {
-    setMessage(elements.clipValidationMessage, "标注片段时长必须在 3 到 15 秒之间", "warn");
+  if (duration < CLIP_MIN_DURATION - CLIP_DURATION_EPS) {
+    setMessage(elements.clipValidationMessage, "标注片段长度不能小于 2 秒", "warn");
+    return false;
+  }
+  if (duration > CLIP_MAX_DURATION + CLIP_DURATION_EPS) {
+    setMessage(elements.clipValidationMessage, "标注片段长度不能大于 15 秒", "warn");
     return false;
   }
   setMessage(
     elements.clipValidationMessage,
-    `当前片段长度 ${duration.toFixed(1)} 秒，符合要求`,
+    `当前片段长度 ${duration.toFixed(1)} 秒，合法范围 ${CLIP_MIN_DURATION}-${CLIP_MAX_DURATION} 秒`,
     "ok"
   );
   return true;
@@ -460,26 +850,32 @@ async function runVlmAssist() {
   }
 }
 
-async function translateText(text) {
-  return fetchJson("/api/translate", {
+async function translateText(text, direction = "zh-en") {
+  const endpoint = direction === "en-zh" ? "/api/translate-en-zh" : "/api/translate";
+  return fetchJson(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
 }
 
-async function runTranslate() {
+async function runTranslate(direction = "zh-en") {
   const source = elements.translateSource.value.trim();
   if (!source) {
-    setMessage(elements.translateMessage, "请输入中文内容", "warn");
+    setMessage(
+      elements.translateMessage,
+      direction === "en-zh" ? "请输入英文内容" : "请输入中文内容",
+      "warn"
+    );
     return;
   }
 
   state.loading.translate = true;
   elements.translateBtn.disabled = true;
+  elements.translateToZhBtn.disabled = true;
   setMessage(elements.translateMessage, "正在翻译...", "");
   try {
-    const payload = await translateText(source);
+    const payload = await translateText(source, direction);
     elements.translateResult.value = payload.translated_text || "";
     setMessage(elements.translateMessage, `翻译完成，来源: ${payload.provider}`, "ok");
   } catch (error) {
@@ -487,6 +883,7 @@ async function runTranslate() {
   } finally {
     state.loading.translate = false;
     elements.translateBtn.disabled = false;
+    elements.translateToZhBtn.disabled = false;
   }
 }
 
@@ -499,7 +896,7 @@ async function translateIntoField(targetId) {
     return;
   }
   elements.translateSource.value = source;
-  await runTranslate();
+  await runTranslate("zh-en");
   if (elements.translateResult.value.trim()) {
     target.value = elements.translateResult.value.trim();
   }
@@ -518,6 +915,7 @@ async function saveSettings() {
           api_base: elements.vlmApiBaseInput.value.trim(),
           model: elements.vlmModelInput.value.trim(),
           api_key: elements.vlmApiKeyInput.value.trim(),
+          translate_to_zh: elements.vlmTranslateToZhInput.checked,
         },
         foley: {
           conda_env: elements.foleyCondaEnvInput.value.trim(),
@@ -557,6 +955,11 @@ function validateAnnotation() {
   if (!elements.motionPromptInput.value.trim()) {
     throw new Error("Motion Prompt 为必填项");
   }
+  const statusEntry = state.videoStatusByPath[state.selectedVideo.absolute_path] || {};
+  if (!isClaimedByCurrentUser(statusEntry)) {
+    throw new Error("请先领取该视频后再保存");
+  }
+  getAnnotationPathOrThrow();
   if (elements.useEditingInput.checked) {
     if (!elements.editingPromptInput.value.trim()) {
       throw new Error("启用 Editing 时，Editing Prompt 为必填");
@@ -567,9 +970,17 @@ function validateAnnotation() {
   }
 }
 
+async function ensureSaveClaimReady() {
+  if (!state.selectedVideo) return;
+  const statusEntry = state.videoStatusByPath[state.selectedVideo.absolute_path] || {};
+  if (isClaimedByCurrentUser(statusEntry)) return;
+  await claimVideoOrThrow(state.selectedVideo);
+}
+
 function buildAnnotationPayload() {
   const clip = getClipRange();
   return {
+    annotation_path: getCurrentAnnotationPath(),
     video_root: elements.videoRootInput.value.trim(),
     video_path: state.selectedVideo.absolute_path,
     video_relative_path: state.selectedVideo.relative_path,
@@ -580,6 +991,7 @@ function buildAnnotationPayload() {
     vlm_prompt: elements.vlmPromptInput.value.trim(),
     vlm_summary: elements.vlmSummaryOutput.value.trim(),
     current_state: elements.currentStateInput.value.trim(),
+    mental_reasoning: elements.mentalReasoningInput.value.trim(),
     use_editing: elements.useEditingInput.checked,
     editing_prompt: elements.editingPromptInput.value.trim(),
     editing_start: Number(elements.editingStartInput.value || 0),
@@ -600,19 +1012,60 @@ async function saveAnnotation() {
   setMessage(elements.saveMessage, "正在保存标注...", "");
   try {
     validateAnnotation();
+    await ensureSaveClaimReady();
     const payload = buildAnnotationPayload();
     const response = await fetchJson("/api/annotations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    setMessage(elements.saveMessage, `保存成功: ${response.saved_at}`, "ok");
-    await loadRecentAnnotations();
+    if (response.annotation_file) {
+      elements.annotationPathInput.value = response.annotation_file;
+      saveAnnotationPathPreference(response.annotation_file);
+    } else {
+      saveAnnotationPathPreference(getCurrentAnnotationPath());
+    }
+    setMessage(
+      elements.saveMessage,
+      `保存成功: ${response.saved_at} · ${response.annotation_file || getCurrentAnnotationPath()}`,
+      "ok"
+    );
+    await refreshVideoStatuses();
+    resetClaimHeartbeat();
+    await loadCurrentVideoAnnotations(response.annotation_file || getCurrentAnnotationPath());
+    await loadAnnotatedVideos(response.annotation_file || getCurrentAnnotationPath());
   } catch (error) {
     setMessage(elements.saveMessage, error.message, "error");
   } finally {
     state.loading.save = false;
     elements.saveBtn.disabled = false;
+  }
+}
+
+async function markVideoVerified() {
+  if (!state.selectedVideo) {
+    setMessage(elements.saveMessage, "请先选择视频", "warn");
+    return;
+  }
+  const currentStatus = getVideoStatus(state.selectedVideo.absolute_path);
+  if (currentStatus !== "completed_unverified" && currentStatus !== "verified") {
+    setMessage(elements.saveMessage, "只有 completed(unverified) 才能标记 verified", "warn");
+    return;
+  }
+  try {
+    const payload = await fetchJson("/api/video-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        video_path: state.selectedVideo.absolute_path,
+        status: "verified",
+      }),
+    });
+    updateVideoStatusEntry(state.selectedVideo.absolute_path, payload.status_entry);
+    renderVideoList();
+    setMessage(elements.saveMessage, "已标记为 verified", "ok");
+  } catch (error) {
+    setMessage(elements.saveMessage, error.message, "error");
   }
 }
 
@@ -761,52 +1214,208 @@ async function startEditingFoley() {
   }
 }
 
-async function loadRecentAnnotations() {
+async function loadCurrentVideoAnnotations(pathOverride = "") {
   try {
-    const payload = await fetchJson("/api/annotations");
-    renderRecentAnnotations(payload.annotations || []);
+    const targetPath = pathOverride || getCurrentAnnotationPath();
+    const params = new URLSearchParams();
+    if (targetPath) {
+      params.set("path", targetPath);
+    }
+    if (state.selectedVideo?.absolute_path) {
+      params.set("video_path", state.selectedVideo.absolute_path);
+    }
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const payload = await fetchJson(`/api/annotations${query}`);
+    if (payload.annotation_file) {
+      elements.annotationPathInput.value = payload.annotation_file;
+      saveAnnotationPathPreference(payload.annotation_file);
+    }
+    const filtered = (payload.annotations || []).filter((item) => isAnnotationForSelectedVideo(item));
+    renderCurrentVideoAnnotations(filtered);
   } catch (error) {
     elements.recentList.innerHTML = `<p class="video-path">${error.message}</p>`;
   }
 }
 
-function renderRecentAnnotations(items) {
-  elements.recentList.innerHTML = "";
+function isAnnotationForSelectedVideo(item) {
+  if (!state.selectedVideo?.absolute_path) return false;
+  const selectedAbs = normalizePathKey(state.selectedVideo.absolute_path);
+  const selectedRel = normalizePathKey(state.selectedVideo.relative_path);
+  const itemAbs = normalizePathKey(item.video_path || "");
+  const itemRel = normalizePathKey(item.video_relative_path || "");
+  return (itemAbs && itemAbs === selectedAbs) || (itemRel && selectedRel && itemRel === selectedRel);
+}
+
+function renderAnnotatedVideos(items) {
+  elements.annotatedVideosList.innerHTML = "";
+  elements.annotatedVideoCount.textContent = `${items.length} 个`;
   if (!items.length) {
-    elements.recentList.innerHTML = '<p class="video-path">还没有保存过标注</p>';
+    elements.annotatedVideosList.innerHTML = '<p class="video-path">还没有已标注视频</p>';
+    return;
+  }
+  items.forEach((item) => {
+    const node = elements.annotatedVideoItemTemplate.content.firstElementChild.cloneNode(true);
+    const name = item.video_relative_path || item.video_path || "未命名视频";
+    node.querySelector(".video-name").textContent = name;
+    node.querySelector(".video-path").textContent = `片段数: ${item.segment_count} · 最近保存: ${
+      item.latest_saved_at || "--"
+    }`;
+    const found = state.videos.find(
+      (video) => normalizePathKey(video.absolute_path) === normalizePathKey(item.video_path)
+    );
+    if (state.selectedVideo?.absolute_path && isAnnotationForSelectedVideo(item)) {
+      node.classList.add("active");
+    }
+    if (!found) {
+      node.disabled = true;
+      node.title = "当前目录下未找到该视频";
+    } else {
+      node.addEventListener("click", async () => {
+        try {
+          await selectVideo(found);
+        } catch (error) {
+          setMessage(elements.rootMessage, error.message, "error");
+        }
+      });
+    }
+    elements.annotatedVideosList.appendChild(node);
+  });
+}
+
+async function loadAnnotatedVideos(pathOverride = "") {
+  try {
+    const targetPath = pathOverride || getCurrentAnnotationPath();
+    const query = targetPath ? `?path=${encodeURIComponent(targetPath)}` : "";
+    const payload = await fetchJson(`/api/annotations${query}`);
+    if (payload.annotation_file) {
+      elements.annotationPathInput.value = payload.annotation_file;
+      saveAnnotationPathPreference(payload.annotation_file);
+    }
+    const grouped = new Map();
+    (payload.annotations || []).forEach((item) => {
+      const key = normalizePathKey(item.video_path || "");
+      if (!key) return;
+      const savedAt = item.saved_at || item.ui_created_at || "";
+      const existing = grouped.get(key);
+      if (!existing) {
+        grouped.set(key, {
+          video_path: item.video_path || "",
+          video_relative_path: item.video_relative_path || "",
+          segment_count: 1,
+          latest_saved_at: savedAt,
+        });
+        return;
+      }
+      existing.segment_count += 1;
+      if (savedAt > existing.latest_saved_at) {
+        existing.latest_saved_at = savedAt;
+      }
+    });
+    const items = Array.from(grouped.values()).sort((a, b) =>
+      String(b.latest_saved_at || "").localeCompare(String(a.latest_saved_at || ""))
+    );
+    renderAnnotatedVideos(items);
+  } catch (error) {
+    elements.annotatedVideosList.innerHTML = `<p class="video-path">${error.message}</p>`;
+    elements.annotatedVideoCount.textContent = "0 个";
+  }
+}
+
+async function startWorkspaceForCurrentUser() {
+  await loadConfig();
+  await loadVideos();
+  await loadCurrentVideoAnnotations();
+  await loadAnnotatedVideos();
+  toggleEditingFields();
+}
+
+function annotationPreviewText(item) {
+  const lines = [];
+  if (item.current_state) lines.push(`Current State: ${item.current_state}`);
+  if (item.reaction) lines.push(`Reaction: ${item.reaction}`);
+  if (item.motion_prompt) lines.push(`Motion Prompt: ${item.motion_prompt}`);
+  if (item.mental_reasoning) lines.push(`Mental Reasoning: ${item.mental_reasoning}`);
+  if (item.notes) lines.push(`Notes: ${item.notes}`);
+  return lines.join("\n");
+}
+
+function renderCurrentVideoAnnotations(items) {
+  elements.recentList.innerHTML = "";
+  if (!state.selectedVideo?.absolute_path) {
+    elements.recentList.innerHTML = '<p class="video-path">请选择视频后查看该视频的已保存片段</p>';
+    return;
+  }
+  if (!items.length) {
+    elements.recentList.innerHTML = '<p class="video-path">当前视频还没有已保存片段</p>';
     return;
   }
 
   items
     .slice()
-    .reverse()
+    .sort((a, b) => Number(a.clip_start || 0) - Number(b.clip_start || 0))
     .forEach((item) => {
       const node = elements.recentItemTemplate.content.firstElementChild.cloneNode(true);
-      node.querySelector("h3").textContent = item.video_relative_path || item.video_path || "未命名视频";
+      node.querySelector("h3").textContent = `片段 ${formatSeconds(item.clip_start)} - ${formatSeconds(
+        item.clip_end
+      )}`;
       node.querySelector(
         ".recent-meta"
-      ).textContent = `${formatSeconds(item.clip_start)} - ${formatSeconds(item.clip_end)} · ${
-        item.saved_at || item.ui_created_at || ""
-      }`;
-      node.querySelector(".recent-text").textContent =
-        item.current_state || item.reaction || item.motion_prompt || "(空)";
+      ).textContent = `保存时间: ${item.saved_at || item.ui_created_at || "--"}`;
+      node.querySelector(".recent-text").textContent = annotationPreviewText(item) || "(空)";
+      const deleteBtn = node.querySelector(".recent-delete-btn");
+      if (deleteBtn) {
+        deleteBtn.disabled = !item.annotation_id;
+        deleteBtn.addEventListener("click", async () => {
+          if (!item.annotation_id) return;
+          try {
+            await fetchJson("/api/annotations-delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                annotation_id: item.annotation_id,
+                annotation_path: item.annotation_path || getCurrentAnnotationPath(),
+              }),
+            });
+            await loadCurrentVideoAnnotations(item.annotation_path || getCurrentAnnotationPath());
+            await loadAnnotatedVideos(item.annotation_path || getCurrentAnnotationPath());
+            setMessage(elements.saveMessage, "已删除该条标注", "ok");
+          } catch (error) {
+            setMessage(elements.saveMessage, error.message, "error");
+          }
+        });
+      }
       elements.recentList.appendChild(node);
     });
 }
 
 function bindEvents() {
+  elements.applyUserBtn.addEventListener("click", async () => {
+    try {
+      setCurrentUser(elements.userNameInput.value);
+      setMessage(elements.rootMessage, `已登录用户: ${state.userName}`, "ok");
+      await startWorkspaceForCurrentUser();
+    } catch (error) {
+      setMessage(elements.rootMessage, error.message, "error");
+    }
+  });
+  elements.userNameInput.addEventListener("keydown", async (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    elements.applyUserBtn.click();
+  });
   elements.refreshVideosBtn.addEventListener("click", () => loadVideos());
   elements.uploadBtn.addEventListener("click", handleUpload);
   elements.saveSettingsBtn.addEventListener("click", saveSettings);
   elements.videoPlayer.addEventListener("loadedmetadata", () => {
-    state.clipDuration = elements.videoPlayer.duration || 0;
-    elements.durationLabel.textContent = `总时长: ${formatSeconds(state.clipDuration)}`;
-    elements.clipStartInput.value = "0.0";
-    elements.clipEndInput.value = Math.min(5, state.clipDuration || 5).toFixed(1);
-    elements.editingStartInput.value = elements.clipStartInput.value;
-    elements.editingEndInput.value = elements.clipEndInput.value;
-    validateClipRange();
-    validateEditingRange();
+    const duration = elements.videoPlayer.duration;
+    if (state.selectedVideo?.absolute_path) {
+      applyVideoDuration(duration, false);
+      ensureSelectedVideoDuration(state.selectedVideo).catch(() => {});
+    }
+  });
+  elements.videoPlayer.addEventListener("durationchange", () => {
+    const duration = elements.videoPlayer.duration;
+    applyVideoDuration(duration, false);
   });
   elements.clipStartInput.addEventListener("input", () => {
     validateClipRange();
@@ -828,10 +1437,28 @@ function bindEvents() {
   });
   elements.useEditingInput.addEventListener("change", toggleEditingFields);
   elements.runVlmBtn.addEventListener("click", runVlmAssist);
-  elements.translateBtn.addEventListener("click", runTranslate);
+  elements.translateBtn.addEventListener("click", () => runTranslate("zh-en"));
+  elements.translateToZhBtn.addEventListener("click", () => runTranslate("en-zh"));
+  elements.rememberPathBtn.addEventListener("click", async () => {
+    const annotationPath = getCurrentAnnotationPath();
+    if (!annotationPath) {
+      setMessage(elements.saveMessage, "请先填写标注保存路径（.json 或 .jsonl）", "warn");
+      return;
+    }
+    saveAnnotationPathPreference(annotationPath);
+    setMessage(elements.saveMessage, `已记住标注路径: ${annotationPath}`, "ok");
+    await loadCurrentVideoAnnotations(annotationPath);
+    await loadAnnotatedVideos(annotationPath);
+  });
   elements.saveBtn.addEventListener("click", saveAnnotation);
+  elements.verifyBtn.addEventListener("click", markVideoVerified);
   elements.editingRunBtn.addEventListener("click", startEditingFoley);
-  elements.reloadAnnotationsBtn.addEventListener("click", loadRecentAnnotations);
+  elements.reloadAnnotationsBtn.addEventListener("click", async () => {
+    await loadCurrentVideoAnnotations();
+    await loadAnnotatedVideos();
+  });
+  window.addEventListener("pagehide", releaseCurrentVideoClaimSync);
+  window.addEventListener("beforeunload", releaseCurrentVideoClaimSync);
 
   document.querySelectorAll(".fill-translate").forEach((button) => {
     button.addEventListener("click", () => {
@@ -855,10 +1482,21 @@ function bindEvents() {
 
 async function init() {
   bindEvents();
-  await loadConfig();
-  await loadVideos();
-  await loadRecentAnnotations();
-  toggleEditingFields();
+  const savedUserName = window.localStorage.getItem(USER_NAME_STORAGE_KEY) || "";
+  if (savedUserName.trim()) {
+    setCurrentUser(savedUserName);
+    await startWorkspaceForCurrentUser();
+  } else {
+    elements.currentUserPill.textContent = "用户: 未登录";
+    setMessage(elements.rootMessage, "请先输入用户名并点击进入", "warn");
+    toggleEditingFields();
+  }
+  window.setInterval(() => {
+    if (!state.annotatorId) return;
+    if (document.visibilityState !== "visible") return;
+    if (!state.selectedVideo?.absolute_path) return;
+    refreshVideoStatuses().catch(() => {});
+  }, VIDEO_STATUS_POLL_INTERVAL_MS);
 }
 
 init().catch((error) => {

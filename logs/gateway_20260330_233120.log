@@ -1,0 +1,486 @@
+nohup: ignoring input
+[30/Mar/2026 23:31:31] "GET /api/videos?root=~%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:31:33] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET /styles.css HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET /app.js HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET /api/config HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:32:22] "GET /api/annotations HTTP/1.1" 200 -
+[30/Mar/2026 23:32:23] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:32:25] code 404, message Static file not found.
+[30/Mar/2026 23:32:25] "GET /favicon.ico HTTP/1.1" 404 -
+[30/Mar/2026 23:32:25] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:33:40] "POST /api/editing HTTP/1.1" 200 -
+[30/Mar/2026 23:33:40] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:43] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:46] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:49] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:52] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:55] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:33:58] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:01] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:04] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:07] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:11] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:14] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:17] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:21] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:24] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:28] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:32] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:36] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:34:40] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/annotator_gateway.py", line 177, in run_remote_editing_task
+    raise RuntimeError(
+RuntimeError: Foley worker did not become ready: Cannot reach Foley worker: [Errno 111] Connection refused
+[30/Mar/2026 23:34:44] "GET /api/editing-task?id=19121c14602a HTTP/1.1" 200 -
+[30/Mar/2026 23:35:55] "POST /api/editing HTTP/1.1" 200 -
+[30/Mar/2026 23:35:55] "GET /api/editing-task?id=37ef1dcaadac HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/annotator_gateway.py", line 177, in run_remote_editing_task
+    raise RuntimeError(
+RuntimeError: Cannot reach Foley worker: [Errno 111] Connection refused
+[30/Mar/2026 23:35:58] "GET /api/editing-task?id=37ef1dcaadac HTTP/1.1" 200 -
+[30/Mar/2026 23:37:10] "POST /api/editing HTTP/1.1" 200 -
+[30/Mar/2026 23:37:10] "GET /api/editing-task?id=dd4450589ba3 HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/annotator_gateway.py", line 177, in run_remote_editing_task
+    raise RuntimeError(
+RuntimeError: Cannot reach Foley worker: [Errno 111] Connection refused
+[30/Mar/2026 23:37:13] "GET /api/editing-task?id=dd4450589ba3 HTTP/1.1" 200 -
+[30/Mar/2026 23:41:06] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:41:06] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:43:28] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:43:28] "GET /styles.css HTTP/1.1" 200 -
+[30/Mar/2026 23:43:28] "GET /app.js HTTP/1.1" 200 -
+[30/Mar/2026 23:43:29] "GET /api/config HTTP/1.1" 200 -
+[30/Mar/2026 23:43:29] code 404, message Static file not found.
+[30/Mar/2026 23:43:29] "GET /favicon.ico HTTP/1.1" 404 -
+[30/Mar/2026 23:43:29] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:43:29] "GET /api/annotations HTTP/1.1" 200 -
+[30/Mar/2026 23:43:50] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:43:51] "GET /styles.css HTTP/1.1" 200 -
+[30/Mar/2026 23:43:51] "GET /app.js HTTP/1.1" 200 -
+[30/Mar/2026 23:43:51] "GET /api/config HTTP/1.1" 200 -
+[30/Mar/2026 23:43:52] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:43:52] "GET /api/annotations HTTP/1.1" 200 -
+[30/Mar/2026 23:44:22] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:44:24] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:44:24] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[30/Mar/2026 23:44:24] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('106.37.77.106', 39939)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1243, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1408, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1398, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[30/Mar/2026 23:44:24] code 404, message Static file not found.
+[30/Mar/2026 23:44:24] "GET /favicon.ico HTTP/1.1" 404 -
+[30/Mar/2026 23:44:25] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:44:31] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:44:31] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[30/Mar/2026 23:44:31] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[30/Mar/2026 23:44:32] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('106.37.77.106', 39952)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1243, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1408, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1398, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[30/Mar/2026 23:45:00] "GET / HTTP/1.1" 200 -
+[30/Mar/2026 23:45:00] "GET /styles.css HTTP/1.1" 200 -
+[30/Mar/2026 23:45:00] "GET /app.js HTTP/1.1" 200 -
+[30/Mar/2026 23:45:00] "GET /api/config HTTP/1.1" 200 -
+[30/Mar/2026 23:45:01] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[30/Mar/2026 23:45:01] "GET /api/annotations HTTP/1.1" 200 -
+[30/Mar/2026 23:46:33] "POST /api/editing HTTP/1.1" 200 -
+[30/Mar/2026 23:46:33] "GET /api/editing-task?id=914bee047f59 HTTP/1.1" 200 -
+[30/Mar/2026 23:46:36] "GET /api/editing-task?id=914bee047f59 HTTP/1.1" 200 -
+[30/Mar/2026 23:46:39] "GET /api/editing-task?id=914bee047f59 HTTP/1.1" 200 -
+[30/Mar/2026 23:46:42] "GET /api/editing-task?id=914bee047f59 HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/annotator_gateway.py", line 177, in run_remote_editing_task
+    raise RuntimeError(
+RuntimeError: Foley worker error 404: {
+  "ok": false,
+  "error": "Worker task not found: c5712e39d761",
+  "type": "FileNotFoundError"
+}
+[31/Mar/2026 00:03:31] "GET / HTTP/1.1" 200 -
+[31/Mar/2026 00:03:31] "GET /styles.css HTTP/1.1" 200 -
+[31/Mar/2026 00:03:31] "GET /app.js HTTP/1.1" 200 -
+[31/Mar/2026 00:03:31] "GET /api/config HTTP/1.1" 200 -
+[31/Mar/2026 00:03:31] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 00:03:31] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 00:03:33] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 00:03:48] "POST /api/editing HTTP/1.1" 200 -
+[31/Mar/2026 00:03:48] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:03:51] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:03:54] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:03:57] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:00] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:03] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:06] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:09] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:12] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:15] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:19] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:22] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:25] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:28] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:31] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:34] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:38] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:42] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:45] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:48] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:51] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:54] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:04:57] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:00] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:03] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:06] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:09] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:12] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:15] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:18] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:21] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:24] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:27] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:31] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:34] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:37] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:40] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:43] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:46] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:49] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:52] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:55] "GET /api/editing-task?id=92c1d3a97002 HTTP/1.1" 200 -
+[31/Mar/2026 00:05:55] "GET /media?path=/home/ubuntu/UMR_DATA/gateway_editing_runs/92c1d3a97002/foley_output/editing_clip_generated.wav HTTP/1.1" 206 -
+[31/Mar/2026 00:05:57] code 404, message Static file not found.
+[31/Mar/2026 00:05:57] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 00:05:57] "GET /media?path=/home/ubuntu/UMR_DATA/gateway_editing_runs/92c1d3a97002/foley_output/editing_clip_generated.wav HTTP/1.1" 206 -
+[31/Mar/2026 00:06:08] "POST /api/editing HTTP/1.1" 200 -
+[31/Mar/2026 00:06:08] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:11] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:14] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:17] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:20] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:23] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:26] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:29] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:32] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:35] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:38] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:41] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:44] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:47] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:50] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:54] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:06:57] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:00] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:03] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:06] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:09] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:12] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:15] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:18] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:21] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:24] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:27] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:30] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:33] "GET /api/editing-task?id=30b93b0a7d51 HTTP/1.1" 200 -
+[31/Mar/2026 00:07:33] "GET /media?path=/home/ubuntu/UMR_DATA/gateway_editing_runs/30b93b0a7d51/foley_output/editing_clip_generated.wav HTTP/1.1" 206 -
+[31/Mar/2026 10:35:10] "GET / HTTP/1.1" 200 -
+[31/Mar/2026 10:35:10] "GET /styles.css HTTP/1.1" 200 -
+[31/Mar/2026 10:35:10] "GET /app.js HTTP/1.1" 200 -
+[31/Mar/2026 10:35:10] "GET /api/config HTTP/1.1" 200 -
+[31/Mar/2026 10:35:10] code 404, message Static file not found.
+[31/Mar/2026 10:35:10] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 10:35:10] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 10:35:11] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 10:57:49] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 10:57:50] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 10:57:51] code 404, message Static file not found.
+[31/Mar/2026 10:57:51] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 12:16:40] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 16:02:10] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 16:02:11] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 19:23:33] "GET / HTTP/1.1" 200 -
+[31/Mar/2026 19:23:33] "GET /app.js HTTP/1.1" 200 -
+[31/Mar/2026 19:23:33] "GET /styles.css HTTP/1.1" 200 -
+[31/Mar/2026 19:23:34] "GET /api/config HTTP/1.1" 200 -
+[31/Mar/2026 19:23:34] code 404, message Static file not found.
+[31/Mar/2026 19:23:34] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 19:23:34] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 19:23:34] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 20:01:15] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 20:01:27] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:30] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:32] code 404, message Static file not found.
+[31/Mar/2026 20:01:32] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 20:01:32] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:43] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:45] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:50] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 20:01:51] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[31/Mar/2026 20:01:53] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('39.144.109.154', 22288)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1243, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1408, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1398, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[31/Mar/2026 20:01:57] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f104_campground.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 22:09:14] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 22:09:14] code 404, message Static file not found.
+[31/Mar/2026 22:09:14] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 22:09:14] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 22:14:53] "GET / HTTP/1.1" 200 -
+[31/Mar/2026 22:14:54] "GET /styles.css HTTP/1.1" 200 -
+[31/Mar/2026 22:14:54] "GET /app.js HTTP/1.1" 200 -
+[31/Mar/2026 22:14:55] "GET /api/config HTTP/1.1" 200 -
+[31/Mar/2026 22:14:55] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 22:14:55] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 22:15:14] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 22:15:14] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[31/Mar/2026 22:15:15] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 400 -
+----------------------------------------
+Exception occurred during processing of request from ('223.104.41.140', 28963)
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1238, in do_GET
+    self.serve_file(preview_path)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1380, in serve_file
+    self.wfile.write(chunk)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/ubuntu/UMR_DATA/server.py", line 1243, in do_GET
+    self.handle_exception(exc)
+  File "/home/ubuntu/UMR_DATA/server.py", line 1408, in handle_exception
+    self.send_json(
+  File "/home/ubuntu/UMR_DATA/server.py", line 1398, in send_json
+    self.end_headers()
+  File "/usr/lib/python3.12/http/server.py", line 538, in end_headers
+    self.flush_headers()
+  File "/usr/lib/python3.12/http/server.py", line 542, in flush_headers
+    self.wfile.write(b"".join(self._headers_buffer))
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+[31/Mar/2026 22:15:15] code 404, message Static file not found.
+[31/Mar/2026 22:15:15] "GET /favicon.ico HTTP/1.1" 404 -
+[31/Mar/2026 22:15:15] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[31/Mar/2026 22:15:17] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/urllib/request.py", line 1344, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/usr/lib/python3.12/http/client.py", line 1336, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.12/http/client.py", line 1382, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.12/http/client.py", line 1331, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.12/http/client.py", line 1091, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.12/http/client.py", line 1035, in send
+    self.connect()
+  File "/usr/lib/python3.12/http/client.py", line 1470, in connect
+    super().connect()
+  File "/usr/lib/python3.12/http/client.py", line 1001, in connect
+    self.sock = self._create_connection(
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 852, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/socket.py", line 837, in create_connection
+    sock.connect(sa)
+OSError: [Errno 101] Network is unreachable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1283, in do_POST
+    result = translate_text(str(payload.get("text", "")))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/UMR_DATA/server.py", line 529, in translate_text
+    with request.urlopen(google_url, timeout=20) as resp:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 515, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 532, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 1392, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 1347, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 101] Network is unreachable>
+[31/Mar/2026 22:24:39] "POST /api/translate HTTP/1.1" 400 -
+[31/Mar/2026 22:29:16] "GET / HTTP/1.1" 200 -
+[31/Mar/2026 22:29:16] "GET /styles.css HTTP/1.1" 200 -
+[31/Mar/2026 22:29:17] "GET /app.js HTTP/1.1" 200 -
+[31/Mar/2026 22:29:17] "GET /api/config HTTP/1.1" 200 -
+[31/Mar/2026 22:29:17] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[31/Mar/2026 22:29:17] "GET /api/annotations HTTP/1.1" 200 -
+[31/Mar/2026 22:29:23] "GET /preview?path=/home/ubuntu/UMRM/data/videos/001_f101_mountain_trail.mp4 HTTP/1.1" 206 -
+[01/Apr/2026 10:37:33] "GET / HTTP/1.1" 200 -
+[01/Apr/2026 10:37:33] "GET /styles.css HTTP/1.1" 200 -
+[01/Apr/2026 10:37:33] "GET /app.js HTTP/1.1" 200 -
+[01/Apr/2026 10:37:33] code 404, message Static file not found.
+[01/Apr/2026 10:37:33] "GET /favicon.ico HTTP/1.1" 404 -
+[01/Apr/2026 10:37:33] "GET /api/config HTTP/1.1" 200 -
+[01/Apr/2026 10:37:34] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 10:37:34] "GET /api/annotations HTTP/1.1" 200 -

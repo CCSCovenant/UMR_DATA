@@ -1,0 +1,17 @@
+nohup: ignoring input
+[01/Apr/2026 11:22:48] "POST /api/annotations HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1343, in do_POST
+    validate_annotation_payload(payload)
+  File "/home/ubuntu/UMR_DATA/server.py", line 621, in validate_annotation_payload
+    raise ValueError("标注片段长度不能小于 2 秒。")
+ValueError: 标注片段长度不能小于 2 秒。
+[01/Apr/2026 11:22:48] "POST /api/annotations HTTP/1.1" 400 -
+[01/Apr/2026 11:22:48] "POST /api/annotations HTTP/1.1" 200 -
+[01/Apr/2026 11:22:48] "GET /api/annotations?path=/tmp/umr_annotations_test.jsonl HTTP/1.1" 200 -
+[01/Apr/2026 11:23:08] "POST /api/annotations HTTP/1.1" 200 -
+[01/Apr/2026 11:23:08] "GET /api/annotations?path=/tmp/umr_annotations_test.json HTTP/1.1" 200 -
+[01/Apr/2026 11:32:44] "GET /api/videos?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[01/Apr/2026 11:32:44] code 404, message Static file not found.
+[01/Apr/2026 11:32:44] "GET /favicon.ico HTTP/1.1" 404 -
+[01/Apr/2026 11:32:45] "GET /api/annotations HTTP/1.1" 200 -

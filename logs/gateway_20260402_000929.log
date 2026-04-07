@@ -1,0 +1,14 @@
+nohup: ignoring input
+[02/Apr/2026 00:09:30] "GET /api/videos?root=/data/UMRM/data/EGO/videos/full_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:09:30] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:09:30] [video-transfer] start channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:09:30] [video-transfer] end channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:09:30] "GET /stream-low?path=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:09:30] [video-transfer] start channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=0 elapsed_ms=0.0 detail=mode=transcode
+[02/Apr/2026 00:09:30] [video-transfer] first-chunk channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=28 elapsed_ms=104.5 detail=mode=transcode
+[02/Apr/2026 00:09:30] [video-transfer] end channel=stream-low client=127.0.0.1 file=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 bytes=799 elapsed_ms=113.8 detail=mode=transcode outcome=completed
+[02/Apr/2026 00:09:39] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:09:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:09:57] "GET /api/videos?root=/data/UMRM/data/EGO/videos/full_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:10:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:10:54] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import math
 import mimetypes
 import os
 import re
@@ -26,11 +27,13 @@ STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
 UPLOAD_DIR = BASE_DIR / "uploads"
 ANNOTATION_FILE = DATA_DIR / "annotations.jsonl"
+VIDEO_STATUS_FILE = DATA_DIR / "video_statuses.json"
 SETTINGS_FILE = DATA_DIR / "runtime_settings.json"
 EDITING_RUNS_DIR = BASE_DIR / "editing_runs"
 PREVIEW_CACHE_DIR = BASE_DIR / "preview_cache"
+HLS_CACHE_DIR = PREVIEW_CACHE_DIR / "hls"
 DEFAULT_VIDEO_ROOT = Path(
-    os.environ.get("UMRM_VIDEO_ROOT", "/data/cws/Project/UMRM/data/UMRM/videos")
+    os.environ.get("UMRM_VIDEO_ROOT", "/data/UMRM/data/EGO/videos/full_scale")
 ).resolve()
 VIDEO_EXTS = {".mp4", ".avi", ".mov", ".mkv", ".webm", ".m4v"}
 MAX_FRAME_COUNT = 10
@@ -38,7 +41,31 @@ PREVIEW_ENABLED = os.environ.get("UMRM_PREVIEW_ENABLED", "1") != "0"
 PREVIEW_HEIGHT = max(0, int(os.environ.get("UMRM_PREVIEW_HEIGHT", "540")))
 PREVIEW_VIDEO_BITRATE = os.environ.get("UMRM_PREVIEW_VIDEO_BITRATE", "900k").strip() or "900k"
 PREVIEW_AUDIO_BITRATE = os.environ.get("UMRM_PREVIEW_AUDIO_BITRATE", "96k").strip() or "96k"
+LOW_STREAM_ENABLED = os.environ.get("UMRM_LOW_STREAM_ENABLED", "1") != "0"
+LOW_STREAM_HEIGHT = max(0, int(os.environ.get("UMRM_LOW_STREAM_HEIGHT", "360")))
+LOW_STREAM_VIDEO_BITRATE = os.environ.get("UMRM_LOW_STREAM_VIDEO_BITRATE", "450k").strip() or "450k"
+LOW_STREAM_AUDIO_BITRATE = os.environ.get("UMRM_LOW_STREAM_AUDIO_BITRATE", "64k").strip() or "64k"
+LOW_STREAM_FPS = max(8, int(os.environ.get("UMRM_LOW_STREAM_FPS", "20")))
+HLS_ENABLED = os.environ.get("UMRM_HLS_ENABLED", "1") != "0"
+HLS_SEGMENT_DURATION = max(
+    1, int(os.environ.get("UMRM_HLS_SEGMENT_DURATION", "1"))
+)
+HLS_CACHE_VERSION = os.environ.get("UMRM_HLS_CACHE_VERSION", "v3").strip() or "v3"
 UI_SHARED_TOKEN = os.environ.get("UMRM_SHARED_TOKEN", "").strip()
+CLIP_MIN_DURATION = 2.0
+CLIP_MAX_DURATION = 15.0
+CLIP_DURATION_EPS = 1e-6
+VIDEO_CLAIM_TIMEOUT_SECONDS = 30 * 60
+VIDEO_STATUS_UNCLAIMED = "unclaimed"
+VIDEO_STATUS_CLAIMED = "claimed"
+VIDEO_STATUS_COMPLETED_UNVERIFIED = "completed_unverified"
+VIDEO_STATUS_VERIFIED = "verified"
+VALID_VIDEO_STATUSES = {
+    VIDEO_STATUS_UNCLAIMED,
+    VIDEO_STATUS_CLAIMED,
+    VIDEO_STATUS_COMPLETED_UNVERIFIED,
+    VIDEO_STATUS_VERIFIED,
+}
 
 DEFAULT_VLM_BASE = os.environ.get("OPENAI_BASE_URL") or os.environ.get(
     "OPENAI_API_BASE", "https://aihubmix.com/v1"
@@ -60,11 +87,18 @@ KEEP_FOLEY_WORKER = os.environ.get("UMRM_KEEP_FOLEY_WORKER", "1").strip().lower(
     "false",
     "no",
 }
+NO_PROXY_OPENER = request.build_opener(request.ProxyHandler({}))
 
 EDITING_TASKS: Dict[str, Dict[str, Any]] = {}
 EDITING_TASKS_LOCK = threading.Lock()
 PREVIEW_LOCKS: Dict[str, threading.Lock] = {}
 PREVIEW_LOCKS_GUARD = threading.Lock()
+HLS_LOCKS: Dict[str, threading.Lock] = {}
+HLS_LOCKS_GUARD = threading.Lock()
+HLS_JOBS: Dict[str, subprocess.Popen] = {}
+VIDEO_DURATION_CACHE: Dict[str, float] = {}
+VIDEO_DURATION_CACHE_LOCK = threading.Lock()
+VIDEO_STATUS_LOCK = threading.Lock()
 
 
 def utc_now_iso() -> str:
@@ -77,10 +111,15 @@ def ensure_dirs() -> None:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     EDITING_RUNS_DIR.mkdir(parents=True, exist_ok=True)
     PREVIEW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    HLS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def json_dumps(payload: Any) -> bytes:
     return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+
+
+def is_client_disconnect_error(exc: Exception) -> bool:
+    return isinstance(exc, (BrokenPipeError, ConnectionResetError, ConnectionAbortedError))
 
 
 def read_json_body(handler: BaseHTTPRequestHandler) -> Dict[str, Any]:
@@ -131,6 +170,183 @@ def resolve_root(root_value: Optional[str]) -> Path:
     return DEFAULT_VIDEO_ROOT
 
 
+def resolve_annotation_file(path_value: Optional[str], annotator_id: str = "") -> Path:
+    raw = str(path_value or "").strip()
+    owner = sanitize_annotator_id(annotator_id)
+    if not raw:
+        target = ANNOTATION_FILE
+    else:
+        target = Path(raw).expanduser().resolve()
+    suffix = target.suffix.lower()
+    if suffix not in {".json", ".jsonl"}:
+        raise ValueError("标注保存路径必须是 .json 或 .jsonl 文件。")
+    if not owner:
+        return target
+    if target.parent.name == owner:
+        return target
+    return target.parent / owner / target.name
+    return target
+
+
+def parse_iso_datetime(raw_value: Any) -> Optional[datetime]:
+    text = str(raw_value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def load_video_status_table() -> Dict[str, Dict[str, Any]]:
+    if not VIDEO_STATUS_FILE.exists():
+        return {}
+    with VIDEO_STATUS_FILE.open("r", encoding="utf-8") as fh:
+        raw = fh.read().strip()
+        if not raw:
+            return {}
+        payload = json.loads(raw)
+    if not isinstance(payload, dict):
+        return {}
+    result: Dict[str, Dict[str, Any]] = {}
+    for key, value in payload.items():
+        if isinstance(value, dict):
+            result[str(key)] = dict(value)
+    return result
+
+
+def save_video_status_table(table: Dict[str, Dict[str, Any]]) -> None:
+    ensure_dirs()
+    VIDEO_STATUS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = VIDEO_STATUS_FILE.with_suffix(f"{VIDEO_STATUS_FILE.suffix}.tmp")
+    with temp_path.open("w", encoding="utf-8") as fh:
+        json.dump(table, fh, ensure_ascii=False, indent=2)
+    temp_path.replace(VIDEO_STATUS_FILE)
+
+
+def sanitize_annotator_id(raw_value: Any) -> str:
+    text = str(raw_value or "").strip()
+    text = re.sub(r"[^A-Za-z0-9._:-]+", "_", text)
+    return text[:80] if text else ""
+
+
+def get_request_annotator_id(
+    handler: BaseHTTPRequestHandler,
+    payload: Optional[Dict[str, Any]] = None,
+    allow_fallback: bool = True,
+) -> str:
+    header_value = sanitize_annotator_id(handler.headers.get("X-UMRM-Annotator-ID", ""))
+    payload_value = sanitize_annotator_id((payload or {}).get("annotator_id", ""))
+    if header_value:
+        return header_value
+    if payload_value:
+        return payload_value
+    if not allow_fallback:
+        return ""
+    fallback_ip = sanitize_annotator_id((handler.client_address or ["unknown"])[0])
+    return f"ip:{fallback_ip or 'unknown'}"
+
+
+def get_required_annotator_id(
+    handler: BaseHTTPRequestHandler, payload: Optional[Dict[str, Any]] = None
+) -> str:
+    annotator_id = get_request_annotator_id(handler, payload, allow_fallback=False)
+    if annotator_id:
+        return annotator_id
+    raise ValueError("请先输入用户名后再操作。")
+
+
+def new_video_status_entry(video_path: str, video_relative_path: str = "") -> Dict[str, Any]:
+    now = utc_now_iso()
+    return {
+        "video_path": video_path,
+        "video_relative_path": video_relative_path,
+        "status": VIDEO_STATUS_UNCLAIMED,
+        "claimed_by": "",
+        "claimed_at": "",
+        "claim_expires_at": "",
+        "completed_at": "",
+        "completed_by": "",
+        "verified_at": "",
+        "updated_at": now,
+    }
+
+
+def normalize_video_status_entry(video_path: str, video_relative_path: str, entry: Dict[str, Any]) -> Dict[str, Any]:
+    merged = new_video_status_entry(video_path, video_relative_path)
+    merged.update({k: entry.get(k, merged[k]) for k in merged.keys()})
+    merged["video_path"] = video_path
+    if video_relative_path:
+        merged["video_relative_path"] = video_relative_path
+    status_value = str(merged.get("status", "")).strip()
+    if status_value not in VALID_VIDEO_STATUSES:
+        status_value = VIDEO_STATUS_UNCLAIMED
+    if status_value == VIDEO_STATUS_CLAIMED:
+        status_value = VIDEO_STATUS_UNCLAIMED
+    merged["status"] = status_value
+    merged["claimed_by"] = sanitize_annotator_id(merged.get("claimed_by", ""))
+    merged["completed_by"] = sanitize_annotator_id(merged.get("completed_by", ""))
+    return merged
+
+
+def cleanup_expired_claims(table: Dict[str, Dict[str, Any]]) -> bool:
+    changed = False
+    now = datetime.now(timezone.utc)
+    for video_path, entry in list(table.items()):
+        normalized = normalize_video_status_entry(
+            str(video_path),
+            str(entry.get("video_relative_path", "")),
+            entry if isinstance(entry, dict) else {},
+        )
+        expires_at = parse_iso_datetime(normalized.get("claim_expires_at"))
+        has_active_claim_owner = bool(normalized.get("claimed_by"))
+        if has_active_claim_owner and (expires_at is None or expires_at <= now):
+            normalized["claimed_by"] = ""
+            normalized["claimed_at"] = ""
+            normalized["claim_expires_at"] = ""
+            normalized["updated_at"] = utc_now_iso()
+            changed = True
+        if normalized != entry:
+            table[video_path] = normalized
+            changed = True
+    return changed
+
+
+def resolve_status_entry(
+    table: Dict[str, Dict[str, Any]],
+    video_path: str,
+    video_relative_path: str = "",
+) -> Dict[str, Any]:
+    current = table.get(video_path)
+    if not isinstance(current, dict):
+        entry = new_video_status_entry(video_path, video_relative_path)
+        table[video_path] = entry
+        return entry
+    normalized = normalize_video_status_entry(video_path, video_relative_path, current)
+    table[video_path] = normalized
+    return normalized
+
+
+def apply_video_status_for_videos(videos: List[Dict[str, Any]]) -> None:
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        changed = cleanup_expired_claims(table)
+        for video in videos:
+            path = str(video["absolute_path"])
+            rel = str(video.get("relative_path", ""))
+            entry = resolve_status_entry(table, path, rel)
+            if entry.get("video_relative_path") != rel:
+                entry["video_relative_path"] = rel
+                entry["updated_at"] = utc_now_iso()
+                changed = True
+            video["video_status"] = entry
+        if changed:
+            save_video_status_table(table)
+
+
 def list_videos(root: Path) -> List[Dict[str, Any]]:
     if not root.exists():
         raise FileNotFoundError(f"Video root does not exist: {root}")
@@ -153,11 +369,146 @@ def list_videos(root: Path) -> List[Dict[str, Any]]:
                     stat.st_mtime, tz=timezone.utc
                 ).isoformat(),
                 "media_url": media_url_for_path(path),
+                "hls_media_url": hls_url_for_path(path) if HLS_ENABLED else None,
+                "stream_media_url": low_stream_url_for_path(path),
                 "preview_media_url": preview_url_for_path(path),
                 "preview_cached": preview_cache_path(path).exists(),
             }
         )
+    apply_video_status_for_videos(videos)
     return videos
+
+
+def claim_video(video_path: str, video_relative_path: str, annotator_id: str) -> Dict[str, Any]:
+    normalized_path = str(Path(video_path).expanduser().resolve())
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+    expires_iso = datetime.fromtimestamp(
+        now.timestamp() + VIDEO_CLAIM_TIMEOUT_SECONDS,
+        tz=timezone.utc,
+    ).isoformat()
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        changed = cleanup_expired_claims(table)
+        entry = resolve_status_entry(table, normalized_path, video_relative_path)
+        status_value = entry["status"]
+        if status_value == VIDEO_STATUS_VERIFIED:
+            raise ValueError("该视频已是 verified 状态，不可再次领取。")
+        current_owner = sanitize_annotator_id(entry.get("claimed_by", ""))
+        if current_owner and current_owner != annotator_id:
+            raise ValueError(f"该视频已被 {current_owner} 领取，请稍后重试。")
+        entry["claimed_by"] = annotator_id
+        entry["claimed_at"] = now_iso
+        entry["claim_expires_at"] = expires_iso
+        entry["updated_at"] = now_iso
+        table[normalized_path] = entry
+        save_video_status_table(table)
+        return {"status_entry": entry, "table_changed": changed}
+
+
+def release_video_claim(video_path: str, annotator_id: str) -> Dict[str, Any]:
+    normalized_path = str(Path(video_path).expanduser().resolve())
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        cleanup_expired_claims(table)
+        entry = resolve_status_entry(table, normalized_path)
+        if entry.get("claimed_by") == annotator_id:
+            entry["claimed_by"] = ""
+            entry["claimed_at"] = ""
+            entry["claim_expires_at"] = ""
+            entry["updated_at"] = utc_now_iso()
+            table[normalized_path] = entry
+            save_video_status_table(table)
+        return entry
+
+
+def heartbeat_video_claim(video_path: str, annotator_id: str) -> Dict[str, Any]:
+    normalized_path = str(Path(video_path).expanduser().resolve())
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+    expires_iso = datetime.fromtimestamp(
+        now.timestamp() + VIDEO_CLAIM_TIMEOUT_SECONDS,
+        tz=timezone.utc,
+    ).isoformat()
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        cleanup_expired_claims(table)
+        entry = resolve_status_entry(table, normalized_path)
+        if entry.get("claimed_by") != annotator_id:
+            raise ValueError("当前视频未被你领取，无法续约。")
+        entry["claim_expires_at"] = expires_iso
+        entry["updated_at"] = now_iso
+        table[normalized_path] = entry
+        save_video_status_table(table)
+        return entry
+
+
+def update_video_status(video_path: str, status: str, annotator_id: str) -> Dict[str, Any]:
+    normalized_path = str(Path(video_path).expanduser().resolve())
+    target_status = str(status or "").strip().lower()
+    if target_status not in {VIDEO_STATUS_COMPLETED_UNVERIFIED, VIDEO_STATUS_VERIFIED}:
+        raise ValueError("仅支持更新为 completed_unverified 或 verified。")
+    now_iso = utc_now_iso()
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        cleanup_expired_claims(table)
+        entry = resolve_status_entry(table, normalized_path)
+        current_status = entry["status"]
+        if target_status == VIDEO_STATUS_COMPLETED_UNVERIFIED:
+            if entry.get("claimed_by") != annotator_id:
+                raise ValueError("仅当前领取者可标记为 completed_unverified。")
+            entry["status"] = VIDEO_STATUS_COMPLETED_UNVERIFIED
+            entry["completed_at"] = now_iso
+            entry["completed_by"] = annotator_id
+            entry["claimed_at"] = ""
+            entry["claim_expires_at"] = ""
+            entry["claimed_by"] = ""
+        if target_status == VIDEO_STATUS_VERIFIED:
+            if current_status not in {VIDEO_STATUS_COMPLETED_UNVERIFIED, VIDEO_STATUS_VERIFIED}:
+                raise ValueError("仅 completed_unverified 状态可标记为 verified。")
+            entry["status"] = VIDEO_STATUS_VERIFIED
+            entry["verified_at"] = now_iso
+        entry["updated_at"] = now_iso
+        table[normalized_path] = entry
+        save_video_status_table(table)
+        return entry
+
+
+def get_video_statuses(video_items: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        changed = cleanup_expired_claims(table)
+        result: Dict[str, Dict[str, Any]] = {}
+        for item in video_items:
+            path = str(Path(item.get("video_path", "")).expanduser().resolve())
+            if not path:
+                continue
+            rel = str(item.get("video_relative_path", ""))
+            entry = resolve_status_entry(table, path, rel)
+            if rel and entry.get("video_relative_path") != rel:
+                entry["video_relative_path"] = rel
+                entry["updated_at"] = utc_now_iso()
+                changed = True
+            result[path] = entry
+        if changed:
+            save_video_status_table(table)
+        return result
+
+
+def get_video_statuses_for_root(root: Path) -> Dict[str, Dict[str, Any]]:
+    resolved_root = root.resolve()
+    root_str = str(resolved_root)
+    root_prefix = f"{root_str}{os.sep}"
+    with VIDEO_STATUS_LOCK:
+        table = load_video_status_table()
+        changed = cleanup_expired_claims(table)
+        result: Dict[str, Dict[str, Any]] = {}
+        for video_path, entry in table.items():
+            if video_path == root_str or video_path.startswith(root_prefix):
+                result[video_path] = entry
+        if changed:
+            save_video_status_table(table)
+        return result
 
 
 def media_url_for_path(path: Path) -> str:
@@ -166,6 +517,78 @@ def media_url_for_path(path: Path) -> str:
 
 def preview_url_for_path(path: Path) -> str:
     return f"/preview?path={parse.quote(str(path.resolve()))}"
+
+
+def low_stream_url_for_path(path: Path) -> str:
+    return f"/stream-low?path={parse.quote(str(path.resolve()))}"
+
+
+def hls_cache_key(path: Path) -> str:
+    resolved = path.resolve()
+    stat = resolved.stat()
+    signature = (
+        f"{HLS_CACHE_VERSION}|{HLS_SEGMENT_DURATION}|"
+        f"{resolved}|{stat.st_size}|{stat.st_mtime_ns}"
+    )
+    return hashlib.sha1(signature.encode("utf-8")).hexdigest()
+
+
+def video_duration_cache_key(path: Path) -> str:
+    resolved = path.resolve()
+    stat = resolved.stat()
+    signature = f"{resolved}|{stat.st_size}|{stat.st_mtime_ns}"
+    return hashlib.sha1(signature.encode("utf-8")).hexdigest()
+
+
+def probe_video_duration_seconds(path: Path) -> Optional[float]:
+    resolved = path.resolve()
+    if not resolved.exists() or not resolved.is_file():
+        raise FileNotFoundError(f"Media file not found: {resolved}")
+    cache_key = video_duration_cache_key(resolved)
+    with VIDEO_DURATION_CACHE_LOCK:
+        cached = VIDEO_DURATION_CACHE.get(cache_key)
+        if cached is not None:
+            return cached
+    ffprobe_bin = shutil.which("ffprobe")
+    if not ffprobe_bin:
+        return None
+    result = subprocess.run(
+        [
+            ffprobe_bin,
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(resolved),
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+        timeout=20,
+    )
+    if result.returncode != 0:
+        return None
+    raw_duration = result.stdout.strip()
+    if not raw_duration:
+        return None
+    try:
+        duration_seconds = float(raw_duration)
+    except ValueError:
+        return None
+    if not math.isfinite(duration_seconds) or duration_seconds <= 0:
+        return None
+    with VIDEO_DURATION_CACHE_LOCK:
+        VIDEO_DURATION_CACHE[cache_key] = duration_seconds
+    return duration_seconds
+
+
+def hls_url_for_path(path: Path) -> str:
+    resolved = path.resolve()
+    key = hls_cache_key(resolved)
+    return f"/hls/{key}/index.m3u8?path={parse.quote(str(resolved))}"
 
 
 def resolve_ffmpeg_bin() -> Path:
@@ -192,6 +615,172 @@ def preview_lock_for(cache_key: str) -> threading.Lock:
             lock = threading.Lock()
             PREVIEW_LOCKS[cache_key] = lock
         return lock
+
+
+def hls_lock_for(cache_key: str) -> threading.Lock:
+    with HLS_LOCKS_GUARD:
+        lock = HLS_LOCKS.get(cache_key)
+        if lock is None:
+            lock = threading.Lock()
+            HLS_LOCKS[cache_key] = lock
+        return lock
+
+
+def hls_cache_dir_for_key(cache_key: str) -> Path:
+    if not re.fullmatch(r"[0-9a-f]{40}", cache_key):
+        raise ValueError("Invalid hls cache key.")
+    return HLS_CACHE_DIR / cache_key
+
+
+def is_hls_playlist_ready(playlist_path: Path, output_dir: Path) -> bool:
+    if not playlist_path.exists():
+        return False
+    try:
+        lines = playlist_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return False
+    target_duration = 0
+    has_positive_extinf = False
+    has_existing_segment = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("#EXT-X-TARGETDURATION:"):
+            raw_value = stripped.split(":", 1)[1].strip()
+            try:
+                target_duration = int(raw_value)
+            except ValueError:
+                target_duration = 0
+        elif stripped.startswith("#EXTINF:"):
+            raw_value = stripped.split(":", 1)[1].split(",", 1)[0].strip()
+            try:
+                if float(raw_value) > 0:
+                    has_positive_extinf = True
+            except ValueError:
+                pass
+        elif stripped and not stripped.startswith("#"):
+            if (output_dir / stripped).exists():
+                has_existing_segment = True
+    return target_duration >= 1 and has_positive_extinf and has_existing_segment
+
+
+def ensure_hls_available(source_path: Path, cache_key: str) -> Path:
+    resolved = source_path.resolve()
+    if not resolved.exists() or not resolved.is_file():
+        raise FileNotFoundError(f"Media file not found: {resolved}")
+    if hls_cache_key(resolved) != cache_key:
+        raise ValueError("HLS cache key mismatch.")
+
+    output_dir = hls_cache_dir_for_key(cache_key)
+    playlist_path = output_dir / "index.m3u8"
+    if playlist_path.exists():
+        return playlist_path
+
+    lock = hls_lock_for(cache_key)
+    with lock:
+        if playlist_path.exists():
+            return playlist_path
+        ffmpeg_bin = resolve_ffmpeg_bin()
+        output_dir.mkdir(parents=True, exist_ok=True)
+        segment_pattern = output_dir / "seg_%05d.m4s"
+        log_path = output_dir / "ffmpeg.log"
+        existing_job = HLS_JOBS.get(cache_key)
+        if existing_job and existing_job.poll() is None:
+            job = existing_job
+        else:
+            if existing_job:
+                HLS_JOBS.pop(cache_key, None)
+            cmd = [
+                str(ffmpeg_bin),
+                "-y",
+                "-i",
+                str(resolved),
+                "-map",
+                "0:v:0",
+                "-map",
+                "0:a?",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-tune",
+                "zerolatency",
+                "-pix_fmt",
+                "yuv420p",
+                "-b:v",
+                LOW_STREAM_VIDEO_BITRATE,
+                "-maxrate",
+                LOW_STREAM_VIDEO_BITRATE,
+                "-bufsize",
+                LOW_STREAM_VIDEO_BITRATE,
+                "-r",
+                str(LOW_STREAM_FPS),
+                "-g",
+                str(LOW_STREAM_FPS),
+                "-keyint_min",
+                str(LOW_STREAM_FPS),
+                "-sc_threshold",
+                "0",
+            ]
+            if LOW_STREAM_HEIGHT > 0:
+                cmd.extend(["-vf", f"scale=-2:min({LOW_STREAM_HEIGHT}\\,ih):flags=bilinear"])
+            cmd.extend(
+                [
+                    "-c:a",
+                    "aac",
+                    "-b:a",
+                    LOW_STREAM_AUDIO_BITRATE,
+                    "-f",
+                    "hls",
+                    "-hls_time",
+                    str(HLS_SEGMENT_DURATION),
+                    "-hls_list_size",
+                    "0",
+                    "-hls_playlist_type",
+                    "event",
+                    "-hls_flags",
+                    "independent_segments+append_list",
+                    "-hls_segment_type",
+                    "fmp4",
+                    "-hls_fmp4_init_filename",
+                    "init.mp4",
+                    "-hls_segment_filename",
+                    str(segment_pattern),
+                    str(playlist_path),
+                ]
+            )
+            with log_path.open("w", encoding="utf-8") as log_file:
+                job = subprocess.Popen(
+                    cmd,
+                    stdout=log_file,
+                    stderr=subprocess.STDOUT,
+                    stdin=subprocess.DEVNULL,
+                )
+            HLS_JOBS[cache_key] = job
+
+    wait_started_at = time.perf_counter()
+    while not is_hls_playlist_ready(playlist_path, output_dir):
+        job = HLS_JOBS.get(cache_key)
+        if job is None:
+            break
+        if job.poll() is not None:
+            HLS_JOBS.pop(cache_key, None)
+            if not is_hls_playlist_ready(playlist_path, output_dir):
+                ffmpeg_log = ""
+                if log_path.exists():
+                    ffmpeg_log = log_path.read_text(encoding="utf-8", errors="replace")[-4000:]
+                raise RuntimeError(f"HLS generation failed:\n{ffmpeg_log}")
+            break
+        if (time.perf_counter() - wait_started_at) > 60.0:
+            raise RuntimeError("HLS generation is taking too long, please retry.")
+        time.sleep(0.1)
+
+    if is_hls_playlist_ready(playlist_path, output_dir):
+        return playlist_path
+
+    ffmpeg_log = ""
+    if log_path.exists():
+        ffmpeg_log = log_path.read_text(encoding="utf-8", errors="replace")[-4000:]
+    raise RuntimeError(f"HLS playlist unavailable:\n{ffmpeg_log}")
 
 
 def ensure_preview_available(source_path: Path) -> Path:
@@ -238,7 +827,7 @@ def ensure_preview_available(source_path: Path) -> Path:
             "24",
         ]
         if PREVIEW_HEIGHT > 0:
-            cmd.extend(["-vf", f"scale=-2:min({PREVIEW_HEIGHT},ih):flags=lanczos"])
+            cmd.extend(["-vf", f"scale=-2:min({PREVIEW_HEIGHT}\\,ih):flags=lanczos"])
         cmd.extend(
             [
                 "-c:a",
@@ -279,7 +868,11 @@ def is_request_authorized(handler: BaseHTTPRequestHandler, parsed: parse.ParseRe
 
 
 def request_needs_auth(parsed: parse.ParseResult) -> bool:
-    return parsed.path.startswith("/api/") or parsed.path in {"/media", "/preview"}
+    return (
+        parsed.path.startswith("/api/")
+        or parsed.path in {"/media", "/preview", "/stream-low"}
+        or parsed.path.startswith("/hls/")
+    )
 
 
 def normalize_chat_completion_url(api_base: str) -> str:
@@ -289,6 +882,10 @@ def normalize_chat_completion_url(api_base: str) -> str:
     if base.endswith("/v1"):
         return f"{base}/chat/completions"
     return f"{base}/v1/chat/completions"
+
+
+def urlopen_no_proxy(target: Any, timeout: int):
+    return NO_PROXY_OPENER.open(target, timeout=timeout)
 
 
 def call_chat_completion(
@@ -315,7 +912,7 @@ def call_chat_completion(
 
     req = request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with request.urlopen(req, timeout=timeout) as resp:
+        with urlopen_no_proxy(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
@@ -361,6 +958,7 @@ def default_runtime_settings() -> Dict[str, Any]:
             "api_base": DEFAULT_VLM_BASE,
             "model": "",
             "api_key": "",
+            "translate_to_zh": True,
         },
         "foley": {
             "project_dir": str(DEFAULT_FOLEY_PROJECT_DIR),
@@ -409,6 +1007,8 @@ def save_runtime_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
         settings["vlm"]["model"] = str(vlm_payload["model"]).strip()
     if "api_key" in vlm_payload and str(vlm_payload["api_key"]).strip():
         settings["vlm"]["api_key"] = str(vlm_payload["api_key"]).strip()
+    if "translate_to_zh" in vlm_payload:
+        settings["vlm"]["translate_to_zh"] = bool(vlm_payload["translate_to_zh"])
 
     if "project_dir" in foley_payload:
         settings["foley"]["project_dir"] = str(foley_payload["project_dir"]).strip()
@@ -443,6 +1043,7 @@ def get_public_settings() -> Dict[str, Any]:
             "model": settings["vlm"].get("model", ""),
             "api_key_set": bool(settings["vlm"].get("api_key", "")),
             "api_key_masked": mask_secret(settings["vlm"].get("api_key", "")),
+            "translate_to_zh": bool(settings["vlm"].get("translate_to_zh", True)),
         },
         "foley": settings["foley"],
     }
@@ -519,23 +1120,38 @@ def get_foley_config() -> Dict[str, Any]:
     }
 
 
-def translate_text(text: str) -> Dict[str, Any]:
+def translate_text_between(text: str, source_lang: str, target_lang: str) -> Dict[str, Any]:
     cleaned = text.strip()
     if not cleaned:
         raise ValueError("Text to translate cannot be empty.")
-
-    cfg = get_translation_config()
-    if cfg["api_base"] and cfg["model"]:
-        prompt = (
+    source_lang_norm = source_lang.strip().lower()
+    target_lang_norm = target_lang.strip().lower()
+    if source_lang_norm == "zh" and target_lang_norm == "en":
+        llm_prompt = (
             "Translate the following Chinese text into concise, natural English. "
             "Return translated English only. Do not add notes, quotes, or explanations.\n\n"
             f"{cleaned}"
         )
+        google_sl = "zh-CN"
+        google_tl = "en"
+    elif source_lang_norm == "en" and target_lang_norm == "zh":
+        llm_prompt = (
+            "Translate the following English text into concise, natural Simplified Chinese. "
+            "Return translated Chinese only. Do not add notes, quotes, or explanations.\n\n"
+            f"{cleaned}"
+        )
+        google_sl = "en"
+        google_tl = "zh-CN"
+    else:
+        raise ValueError("Unsupported translation direction.")
+
+    cfg = get_translation_config()
+    if cfg["api_base"] and cfg["model"]:
         response = call_chat_completion(
             api_base=cfg["api_base"],
             api_key=cfg["api_key"],
             model=cfg["model"],
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": llm_prompt}],
             temperature=0.1,
             timeout=120,
         )
@@ -549,17 +1165,30 @@ def translate_text(text: str) -> Dict[str, Any]:
         + parse.urlencode(
             {
                 "client": "gtx",
-                "sl": "zh-CN",
-                "tl": "en",
+                "sl": google_sl,
+                "tl": google_tl,
                 "dt": "t",
                 "q": cleaned,
             }
         )
     )
-    with request.urlopen(google_url, timeout=20) as resp:
-        payload = json.loads(resp.read().decode("utf-8"))
+    try:
+        with urlopen_no_proxy(google_url, timeout=20) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except error.URLError as exc:
+        raise RuntimeError(
+            "翻译服务不可达：当前环境无法访问 translate.googleapis.com。"
+        ) from exc
     translated = "".join(item[0] for item in payload[0] if item and item[0])
     return {"translated_text": translated, "provider": "google-gtx"}
+
+
+def translate_text(text: str) -> Dict[str, Any]:
+    return translate_text_between(text, "zh", "en")
+
+
+def translate_text_en_to_zh(text: str) -> Dict[str, Any]:
+    return translate_text_between(text, "en", "zh")
 
 
 def build_vlm_messages(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -575,10 +1204,13 @@ def build_vlm_messages(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     custom_prompt = str(payload.get("vlm_prompt", "")).strip()
     video_name = str(payload.get("video_name", "")).strip()
 
+    settings = load_runtime_settings()
+    output_zh = bool(settings.get("vlm", {}).get("translate_to_zh", True))
+    output_instruction = "Write concise Simplified Chinese." if output_zh else "Write concise English."
     instruction = (
         "You are helping a human annotator write a current state description for a selected "
         "video clip. Base everything only on visible evidence in the frames.\n"
-        "Write concise English.\n"
+        f"{output_instruction}\n"
         "Focus on:\n"
         "- who or what is present\n"
         "- what is happening in the selected clip\n"
@@ -627,10 +1259,126 @@ def run_vlm_understanding(payload: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def append_annotation(payload: Dict[str, Any]) -> None:
+def validate_annotation_payload(payload: Dict[str, Any]) -> None:
+    clip_start = float(payload.get("clip_start", 0))
+    clip_end = float(payload.get("clip_end", 0))
+    if clip_end <= clip_start:
+        raise ValueError("结束时间必须大于开始时间。")
+    duration = clip_end - clip_start
+    if duration < CLIP_MIN_DURATION - CLIP_DURATION_EPS:
+        raise ValueError("标注片段长度不能小于 2 秒。")
+    if duration > CLIP_MAX_DURATION + CLIP_DURATION_EPS:
+        raise ValueError("标注片段长度不能大于 15 秒。")
+    payload["clip_start"] = clip_start
+    payload["clip_end"] = clip_end
+    payload["clip_duration"] = round(duration, 6)
+    payload["mental_reasoning"] = str(payload.get("mental_reasoning", "")).strip()
+
+
+def load_annotations(annotation_file: Path) -> List[Dict[str, Any]]:
+    if not annotation_file.exists():
+        return []
+    suffix = annotation_file.suffix.lower()
+    if suffix == ".json":
+        with annotation_file.open("r", encoding="utf-8") as fh:
+            raw = fh.read().strip()
+            if not raw:
+                return []
+            data = json.loads(raw)
+            if not isinstance(data, list):
+                raise ValueError("标注文件格式错误：.json 文件应为数组。")
+            return [item for item in data if isinstance(item, dict)]
+    annotations: List[Dict[str, Any]] = []
+    with annotation_file.open("r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            annotations.append(json.loads(line))
+    return annotations
+
+
+def append_annotation(payload: Dict[str, Any], annotation_file: Path) -> None:
     ensure_dirs()
-    with ANNOTATION_FILE.open("a", encoding="utf-8") as fh:
+    annotation_file.parent.mkdir(parents=True, exist_ok=True)
+    if annotation_file.suffix.lower() == ".json":
+        annotations = load_annotations(annotation_file)
+        annotations.append(payload)
+        with annotation_file.open("w", encoding="utf-8") as fh:
+            json.dump(annotations, fh, ensure_ascii=False, indent=2)
+        return
+    with annotation_file.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+
+def annotation_identity_key(item: Dict[str, Any]) -> str:
+    existing = str(item.get("annotation_id", "")).strip()
+    if existing:
+        return existing
+    seed = "|".join(
+        [
+            str(item.get("video_path", "")).strip(),
+            str(item.get("clip_start", "")).strip(),
+            str(item.get("clip_end", "")).strip(),
+            str(item.get("saved_at", "")).strip(),
+            str(item.get("ui_created_at", "")).strip(),
+            str(item.get("annotator_id", "")).strip(),
+            str(item.get("reaction", "")).strip(),
+            str(item.get("motion_prompt", "")).strip(),
+        ]
+    )
+    return hashlib.sha1(seed.encode("utf-8")).hexdigest()
+
+
+def normalize_annotations_for_output(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    normalized: List[Dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        clone = dict(item)
+        clone["annotation_id"] = annotation_identity_key(clone)
+        normalized.append(clone)
+    return normalized
+
+
+def normalize_path_string(path_value: str) -> str:
+    raw = str(path_value or "").strip()
+    if not raw:
+        return ""
+    try:
+        return str(Path(parse.unquote(raw)).expanduser().resolve())
+    except Exception:
+        return raw
+
+
+def delete_annotation_by_id(annotation_file: Path, annotation_id: str, annotator_id: str) -> int:
+    target_id = str(annotation_id or "").strip()
+    if not target_id:
+        raise ValueError("annotation_id 不能为空。")
+    annotations = load_annotations(annotation_file)
+    remaining: List[Dict[str, Any]] = []
+    deleted_count = 0
+    for item in annotations:
+        if not isinstance(item, dict):
+            continue
+        item_id = annotation_identity_key(item)
+        owner = sanitize_annotator_id(item.get("annotator_id", ""))
+        owner_match = (not owner) or owner == annotator_id
+        if item_id == target_id and owner_match:
+            deleted_count += 1
+            continue
+        remaining.append(item)
+    if deleted_count <= 0:
+        return 0
+    annotation_file.parent.mkdir(parents=True, exist_ok=True)
+    if annotation_file.suffix.lower() == ".json":
+        with annotation_file.open("w", encoding="utf-8") as fh:
+            json.dump(remaining, fh, ensure_ascii=False, indent=2)
+        return deleted_count
+    with annotation_file.open("w", encoding="utf-8") as fh:
+        for item in remaining:
+            fh.write(json.dumps(item, ensure_ascii=False) + "\n")
+    return deleted_count
 
 
 def sanitize_filename(name: str) -> str:
@@ -1347,11 +2095,13 @@ class UIRequestHandler(BaseHTTPRequestHandler):
             if parsed.path == "/api/config":
                 settings = get_public_settings()
                 vlm_cfg = get_vlm_config()
+                annotator_id = get_request_annotator_id(self, allow_fallback=False)
+                annotation_file = resolve_annotation_file(None, annotator_id)
                 self.send_json(
                     {
                         "default_video_root": str(DEFAULT_VIDEO_ROOT),
                         "upload_dir": str(UPLOAD_DIR),
-                        "annotation_file": str(ANNOTATION_FILE),
+                        "annotation_file": str(annotation_file),
                         "vlm_configured": bool(vlm_cfg["api_base"] and vlm_cfg["model"]),
                         "translation_configured": bool(
                             get_translation_config()["api_base"]
@@ -1359,6 +2109,10 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                         ),
                         "preview_enabled": PREVIEW_ENABLED,
                         "preview_height": PREVIEW_HEIGHT,
+                        "low_stream_enabled": LOW_STREAM_ENABLED,
+                        "low_stream_height": LOW_STREAM_HEIGHT,
+                        "low_stream_video_bitrate": LOW_STREAM_VIDEO_BITRATE,
+                        "low_stream_audio_bitrate": LOW_STREAM_AUDIO_BITRATE,
                         "shared_access_enabled": bool(UI_SHARED_TOKEN),
                         "settings": settings,
                     }
@@ -1376,18 +2130,42 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                 self.send_json({"root": str(root), "videos": videos})
                 return
 
+            if parsed.path == "/api/video-metadata":
+                query = parse.parse_qs(parsed.query)
+                raw_path = (query.get("path") or [""])[0]
+                source_path = Path(parse.unquote(raw_path)).expanduser().resolve()
+                duration_seconds = probe_video_duration_seconds(source_path)
+                self.send_json(
+                    {
+                        "path": str(source_path),
+                        "duration_seconds": duration_seconds,
+                    }
+                )
+                return
+
+            if parsed.path == "/api/video-statuses":
+                query = parse.parse_qs(parsed.query)
+                root = resolve_root((query.get("root") or [""])[0])
+                statuses = get_video_statuses_for_root(root)
+                self.send_json({"root": str(root), "statuses": statuses})
+                return
+
             if parsed.path == "/api/annotations":
-                if not ANNOTATION_FILE.exists():
-                    self.send_json({"annotations": []})
-                    return
-                annotations = []
-                with ANNOTATION_FILE.open("r", encoding="utf-8") as fh:
-                    for line in fh:
-                        line = line.strip()
-                        if not line:
-                            continue
-                        annotations.append(json.loads(line))
-                self.send_json({"annotations": annotations[-50:]})
+                query = parse.parse_qs(parsed.query)
+                annotator_id = get_required_annotator_id(self)
+                annotation_file = resolve_annotation_file(
+                    (query.get("path") or [""])[0], annotator_id
+                )
+                annotations = normalize_annotations_for_output(load_annotations(annotation_file))
+                target_video_path = str((query.get("video_path") or [""])[0]).strip()
+                if target_video_path:
+                    normalized_target = normalize_path_string(target_video_path)
+                    annotations = [
+                        item
+                        for item in annotations
+                        if normalize_path_string(item.get("video_path", "")) == normalized_target
+                    ]
+                self.send_json({"annotations": annotations, "annotation_file": str(annotation_file)})
                 return
 
             if parsed.path == "/api/editing-task":
@@ -1403,7 +2181,7 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                 if not media_path.exists() or not media_path.is_file():
                     self.send_error(HTTPStatus.NOT_FOUND, "Media file not found.")
                     return
-                self.serve_file(media_path)
+                self.serve_file(media_path, channel="media")
                 return
 
             if parsed.path == "/preview":
@@ -1411,7 +2189,42 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                 raw_path = (query.get("path") or [""])[0]
                 source_path = Path(parse.unquote(raw_path)).expanduser().resolve()
                 preview_path = ensure_preview_available(source_path)
-                self.serve_file(preview_path)
+                self.serve_file(preview_path, channel="preview")
+                return
+
+            if parsed.path == "/stream-low":
+                query = parse.parse_qs(parsed.query)
+                raw_path = (query.get("path") or [""])[0]
+                source_path = Path(parse.unquote(raw_path)).expanduser().resolve()
+                self.serve_low_bitrate_stream(source_path)
+                return
+
+            if parsed.path.startswith("/hls/"):
+                if not HLS_ENABLED:
+                    self.send_error(HTTPStatus.NOT_FOUND, "HLS is disabled.")
+                    return
+                match = re.fullmatch(r"/hls/([0-9a-f]{40})/([A-Za-z0-9._-]+)", parsed.path)
+                if not match:
+                    self.send_error(HTTPStatus.NOT_FOUND, "Invalid HLS path.")
+                    return
+                cache_key, file_name = match.groups()
+                hls_dir = hls_cache_dir_for_key(cache_key)
+                target_path = (hls_dir / file_name).resolve()
+                if not str(target_path).startswith(str(hls_dir.resolve())):
+                    self.send_error(HTTPStatus.FORBIDDEN, "Forbidden.")
+                    return
+                if file_name == "index.m3u8":
+                    query = parse.parse_qs(parsed.query)
+                    raw_source_path = (query.get("path") or [""])[0]
+                    if not raw_source_path:
+                        self.send_error(HTTPStatus.BAD_REQUEST, "Missing source path.")
+                        return
+                    source_path = Path(parse.unquote(raw_source_path)).expanduser().resolve()
+                    ensure_hls_available(source_path, cache_key)
+                if not target_path.exists() or not target_path.is_file():
+                    self.send_error(HTTPStatus.NOT_FOUND, "HLS file not found.")
+                    return
+                self.serve_file(target_path, channel="hls")
                 return
 
             self.serve_static(parsed.path)
@@ -1441,6 +2254,7 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                                 "model": settings["vlm"]["model"],
                                 "api_key_set": bool(settings["vlm"]["api_key"]),
                                 "api_key_masked": mask_secret(settings["vlm"]["api_key"]),
+                                "translate_to_zh": bool(settings["vlm"].get("translate_to_zh", True)),
                             },
                             "foley": settings["foley"],
                         },
@@ -1460,11 +2274,99 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                 self.send_json(result)
                 return
 
+            if parsed.path == "/api/translate-en-zh":
+                payload = read_json_body(self)
+                result = translate_text_en_to_zh(str(payload.get("text", "")))
+                self.send_json(result)
+                return
+
             if parsed.path == "/api/annotations":
                 payload = read_json_body(self)
+                annotator_id = get_required_annotator_id(self, payload)
+                annotation_file = resolve_annotation_file(
+                    payload.get("annotation_path"), annotator_id
+                )
+                validate_annotation_payload(payload)
+                video_path = str(payload.get("video_path", "")).strip()
+                if not video_path:
+                    raise ValueError("video_path 不能为空。")
+                payload["annotator_id"] = annotator_id
                 payload["saved_at"] = utc_now_iso()
-                append_annotation(payload)
-                self.send_json({"ok": True, "saved_at": payload["saved_at"]})
+                payload["annotation_id"] = str(uuid.uuid4())
+                payload["annotation_path"] = str(annotation_file)
+                append_annotation(payload, annotation_file)
+                self.send_json(
+                    {
+                        "ok": True,
+                        "saved_at": payload["saved_at"],
+                        "annotation_id": payload["annotation_id"],
+                        "annotation_file": str(annotation_file),
+                    }
+                )
+                return
+
+            if parsed.path == "/api/annotations-delete":
+                payload = read_json_body(self)
+                annotator_id = get_required_annotator_id(self, payload)
+                annotation_file = resolve_annotation_file(
+                    payload.get("annotation_path"), annotator_id
+                )
+                deleted_count = delete_annotation_by_id(
+                    annotation_file,
+                    str(payload.get("annotation_id", "")).strip(),
+                    annotator_id,
+                )
+                if deleted_count <= 0:
+                    raise ValueError("未找到可删除的标注，或该标注不属于当前用户。")
+                self.send_json(
+                    {
+                        "ok": True,
+                        "deleted_count": deleted_count,
+                        "annotation_file": str(annotation_file),
+                    }
+                )
+                return
+
+            if parsed.path == "/api/video-claim":
+                payload = read_json_body(self)
+                video_path = str(payload.get("video_path", "")).strip()
+                if not video_path:
+                    raise ValueError("video_path 不能为空。")
+                video_relative_path = str(payload.get("video_relative_path", "")).strip()
+                annotator_id = get_required_annotator_id(self, payload)
+                result = claim_video(video_path, video_relative_path, annotator_id)
+                self.send_json({"ok": True, "status_entry": result["status_entry"]})
+                return
+
+            if parsed.path == "/api/video-release":
+                payload = read_json_body(self)
+                video_path = str(payload.get("video_path", "")).strip()
+                if not video_path:
+                    raise ValueError("video_path 不能为空。")
+                annotator_id = get_required_annotator_id(self, payload)
+                status_entry = release_video_claim(video_path, annotator_id)
+                self.send_json({"ok": True, "status_entry": status_entry})
+                return
+
+            if parsed.path == "/api/video-heartbeat":
+                payload = read_json_body(self)
+                video_path = str(payload.get("video_path", "")).strip()
+                if not video_path:
+                    raise ValueError("video_path 不能为空。")
+                annotator_id = get_required_annotator_id(self, payload)
+                status_entry = heartbeat_video_claim(video_path, annotator_id)
+                self.send_json({"ok": True, "status_entry": status_entry})
+                return
+
+            if parsed.path == "/api/video-status":
+                payload = read_json_body(self)
+                video_path = str(payload.get("video_path", "")).strip()
+                if not video_path:
+                    raise ValueError("video_path 不能为空。")
+                status_value = str(payload.get("status", "")).strip().lower()
+                annotator_id = get_required_annotator_id(self, payload)
+                status_entry = update_video_status(video_path, status_value, annotator_id)
+                self.send_json({"ok": True, "status_entry": status_entry})
                 return
 
             if parsed.path == "/api/editing":
@@ -1518,12 +2420,29 @@ class UIRequestHandler(BaseHTTPRequestHandler):
         if not candidate.exists() or not candidate.is_file():
             self.send_error(HTTPStatus.NOT_FOUND, "Static file not found.")
             return
-        self.serve_file(candidate, allow_range=False)
+        self.serve_file(candidate, allow_range=False, channel="static")
 
-    def serve_file(self, file_path: Path, allow_range: bool = True) -> None:
+    def log_video_transfer(
+        self,
+        event: str,
+        channel: str,
+        file_path: Path,
+        bytes_sent: int = 0,
+        elapsed_ms: float = 0.0,
+        detail: str = "",
+    ) -> None:
+        client_ip = self.client_address[0] if self.client_address else "-"
+        sys.stderr.write(
+            f"[{self.log_date_time_string()}] [video-transfer] {event} "
+            f"channel={channel} client={client_ip} file={file_path} "
+            f"bytes={bytes_sent} elapsed_ms={elapsed_ms:.1f} detail={detail}\n"
+        )
+
+    def serve_file(self, file_path: Path, allow_range: bool = True, channel: str = "media") -> None:
         file_size = file_path.stat().st_size
         content_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
         range_header = self.headers.get("Range")
+        should_log_transfer = channel in {"media", "preview", "hls"}
 
         if allow_range and range_header:
             match = re.match(r"bytes=(\d*)-(\d*)", range_header)
@@ -1545,7 +2464,16 @@ class UIRequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
             self.send_header("Accept-Ranges", "bytes")
             self.end_headers()
-
+            bytes_sent = 0
+            started_at = time.perf_counter()
+            outcome = "completed"
+            if should_log_transfer:
+                self.log_video_transfer(
+                    "start",
+                    channel,
+                    file_path,
+                    detail=f"mode=range range=bytes {start}-{end}/{file_size}",
+                )
             with file_path.open("rb") as fh:
                 fh.seek(start)
                 remaining = length
@@ -1553,8 +2481,22 @@ class UIRequestHandler(BaseHTTPRequestHandler):
                     chunk = fh.read(min(64 * 1024, remaining))
                     if not chunk:
                         break
-                    self.wfile.write(chunk)
+                    try:
+                        self.wfile.write(chunk)
+                    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                        outcome = "client_disconnected"
+                        break
+                    bytes_sent += len(chunk)
                     remaining -= len(chunk)
+            if should_log_transfer:
+                self.log_video_transfer(
+                    "end",
+                    channel,
+                    file_path,
+                    bytes_sent=bytes_sent,
+                    elapsed_ms=(time.perf_counter() - started_at) * 1000.0,
+                    detail=f"mode=range outcome={outcome}",
+                )
             return
 
         self.send_response(HTTPStatus.OK)
@@ -1563,32 +2505,187 @@ class UIRequestHandler(BaseHTTPRequestHandler):
         if allow_range:
             self.send_header("Accept-Ranges", "bytes")
         self.end_headers()
+        bytes_sent = 0
+        started_at = time.perf_counter()
+        outcome = "completed"
+        if should_log_transfer:
+            self.log_video_transfer(
+                "start",
+                channel,
+                file_path,
+                detail=f"mode=full size={file_size}",
+            )
         with file_path.open("rb") as fh:
-            shutil.copyfileobj(fh, self.wfile)
+            try:
+                while True:
+                    chunk = fh.read(64 * 1024)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    bytes_sent += len(chunk)
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                outcome = "client_disconnected"
+        if should_log_transfer:
+            self.log_video_transfer(
+                "end",
+                channel,
+                file_path,
+                bytes_sent=bytes_sent,
+                elapsed_ms=(time.perf_counter() - started_at) * 1000.0,
+                detail=f"mode=full outcome={outcome}",
+            )
+
+    def serve_low_bitrate_stream(self, source_path: Path) -> None:
+        if not LOW_STREAM_ENABLED:
+            self.serve_file(source_path, channel="media")
+            return
+        resolved = source_path.resolve()
+        if not resolved.exists() or not resolved.is_file():
+            raise FileNotFoundError(f"Media file not found: {resolved}")
+        ffmpeg_bin = resolve_ffmpeg_bin()
+        cmd = [
+            str(ffmpeg_bin),
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-i",
+            str(resolved),
+            "-map",
+            "0:v:0",
+            "-map",
+            "0:a?",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-tune",
+            "zerolatency",
+            "-pix_fmt",
+            "yuv420p",
+            "-b:v",
+            LOW_STREAM_VIDEO_BITRATE,
+            "-maxrate",
+            LOW_STREAM_VIDEO_BITRATE,
+            "-bufsize",
+            LOW_STREAM_VIDEO_BITRATE,
+            "-r",
+            str(LOW_STREAM_FPS),
+            "-g",
+            str(LOW_STREAM_FPS),
+            "-keyint_min",
+            str(LOW_STREAM_FPS),
+            "-sc_threshold",
+            "0",
+        ]
+        if LOW_STREAM_HEIGHT > 0:
+            cmd.extend(["-vf", f"scale=-2:min({LOW_STREAM_HEIGHT}\\,ih):flags=bilinear"])
+        cmd.extend(
+            [
+                "-c:a",
+                "aac",
+                "-b:a",
+                LOW_STREAM_AUDIO_BITRATE,
+                "-movflags",
+                "frag_keyframe+empty_moov+default_base_moof",
+                "-flush_packets",
+                "1",
+                "-f",
+                "mp4",
+                "pipe:1",
+            ]
+        )
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            bufsize=0,
+        )
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "video/mp4")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Accept-Ranges", "none")
+        self.end_headers()
+        bytes_sent = 0
+        started_at = time.perf_counter()
+        outcome = "completed"
+        first_chunk_logged = False
+        self.log_video_transfer(
+            "start",
+            "stream-low",
+            resolved,
+            detail="mode=transcode",
+        )
+        try:
+            if not process.stdout:
+                return
+            while True:
+                chunk = process.stdout.read(64 * 1024)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                self.wfile.flush()
+                bytes_sent += len(chunk)
+                if not first_chunk_logged:
+                    first_chunk_logged = True
+                    self.log_video_transfer(
+                        "first-chunk",
+                        "stream-low",
+                        resolved,
+                        bytes_sent=bytes_sent,
+                        elapsed_ms=(time.perf_counter() - started_at) * 1000.0,
+                        detail="mode=transcode",
+                    )
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            outcome = "client_disconnected"
+        finally:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=1.0)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=1.0)
+            self.log_video_transfer(
+                "end",
+                "stream-low",
+                resolved,
+                bytes_sent=bytes_sent,
+                elapsed_ms=(time.perf_counter() - started_at) * 1000.0,
+                detail=f"mode=transcode outcome={outcome}",
+            )
 
     def send_json(self, payload: Any, status: int = 200) -> None:
         body = json_dumps(payload)
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            return
 
     def handle_exception(self, exc: Exception) -> None:
+        if is_client_disconnect_error(exc):
+            return
         traceback.print_exc()
         status = HTTPStatus.BAD_REQUEST
         if isinstance(exc, FileNotFoundError):
             status = HTTPStatus.NOT_FOUND
         elif isinstance(exc, RuntimeError):
             status = HTTPStatus.BAD_GATEWAY
-        self.send_json(
-            {
-                "ok": False,
-                "error": str(exc),
-                "type": exc.__class__.__name__,
-            },
-            status=status,
-        )
+        try:
+            self.send_json(
+                {
+                    "ok": False,
+                    "error": str(exc),
+                    "type": exc.__class__.__name__,
+                },
+                status=status,
+            )
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            return
 
     def log_message(self, format: str, *args: Any) -> None:
         sys.stderr.write(
@@ -1609,6 +2706,12 @@ def run_server() -> None:
         print(
             "Preview cache enabled: "
             f"height<={PREVIEW_HEIGHT or 'source'}, video={PREVIEW_VIDEO_BITRATE}, audio={PREVIEW_AUDIO_BITRATE}"
+        )
+    if LOW_STREAM_ENABLED:
+        print(
+            "Low stream enabled: "
+            f"height<={LOW_STREAM_HEIGHT or 'source'}, fps={LOW_STREAM_FPS}, "
+            f"video={LOW_STREAM_VIDEO_BITRATE}, audio={LOW_STREAM_AUDIO_BITRATE}"
         )
     if UI_SHARED_TOKEN:
         print("Shared access token enabled. Open from other machines with ?token=<your-token>.")

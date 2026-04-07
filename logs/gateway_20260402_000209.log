@@ -1,0 +1,243 @@
+nohup: ignoring input
+[02/Apr/2026 00:02:09] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:02:10] "GET /api/videos?root=/data/UMRM/data/EGO/videos/full_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:02:10] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:02:10] [video-transfer] start channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:02:10] [video-transfer] end channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=222 elapsed_ms=0.2 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:10] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:02:10] [video-transfer] start channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:02:10] [video-transfer] end channel=hls client=127.0.0.1 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:24] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:02:39] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:02:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:02:50] "GET / HTTP/1.1" 200 -
+[02/Apr/2026 00:02:50] "GET /styles.css HTTP/1.1" 200 -
+[02/Apr/2026 00:02:50] "GET /app.js HTTP/1.1" 200 -
+[02/Apr/2026 00:02:51] "GET /api/config HTTP/1.1" 200 -
+[02/Apr/2026 00:02:51] "GET /api/videos?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:02:51] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fkuimou%2Fannotations.jsonl HTTP/1.1" 200 -
+[02/Apr/2026 00:02:51] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:02:51] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/00277df3-9107-4592-ba85-b8d054149551.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/init.mp4 bytes=775 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:02:55] "GET /hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:02:55] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:02:55] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/74b568d8e3a090eadbb8fccd00233b2ae0487501/seg_00000.m4s bytes=24 elapsed_ms=0.2 detail=mode=full outcome=completed
+[02/Apr/2026 00:03:06] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:03:21] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:03:36] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:03:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:03:51] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:04:06] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:04:21] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:04:36] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:04:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:04:51] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:05:03] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:05:04] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:05:04] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:05:05] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:05:05] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:05:06] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:05:09] "GET /hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/001e3e4e-2743-47fc-8564-d5efd11f9e90.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:09] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:05:09] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:09] "GET /hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/001e3e4e-2743-47fc-8564-d5efd11f9e90.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:09] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:05:09] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/ac17771a52233ae594bbf6d426ca0f78d85f9dc3/index.m3u8 bytes=222 elapsed_ms=0.2 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000a3525-6c98-4650-aaab-be7d2c7b9402.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=775 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:13] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:13] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:13] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:21] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1834, in do_GET
+    ensure_hls_available(source_path, cache_key)
+  File "/home/ubuntu/UMR_DATA/server.py", line 576, in ensure_hls_available
+    raise ValueError("HLS cache key mismatch.")
+ValueError: HLS cache key mismatch.
+[02/Apr/2026 00:05:22] "GET /hls/ad175299d9283873a853156d07bc09c3e15e0531/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/002ad105-bd9a-4858-953e-54e88dc7587e.mp4 HTTP/1.1" 400 -
+[02/Apr/2026 00:05:24] "GET / HTTP/1.1" 200 -
+[02/Apr/2026 00:05:24] "GET /styles.css HTTP/1.1" 200 -
+[02/Apr/2026 00:05:24] "GET /app.js HTTP/1.1" 200 -
+[02/Apr/2026 00:05:25] "GET /api/config HTTP/1.1" 200 -
+[02/Apr/2026 00:05:25] "GET /api/videos?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:05:25] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fkuimou%2Fannotations.jsonl HTTP/1.1" 200 -
+[02/Apr/2026 00:05:25] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:05:25] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000a3525-6c98-4650-aaab-be7d2c7b9402.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=775 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:26] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:05:26] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:05:26] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:40] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:05:46] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000cd456-ff8d-499b-b0c1-4acead128a8b.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:05:46] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:05:46] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:05:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:05:55] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:06:02] "GET / HTTP/1.1" 200 -
+[02/Apr/2026 00:06:02] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:06:02] "GET /styles.css HTTP/1.1" 200 -
+[02/Apr/2026 00:06:02] "GET /app.js HTTP/1.1" 200 -
+[02/Apr/2026 00:06:03] "GET /api/config HTTP/1.1" 200 -
+[02/Apr/2026 00:06:03] "GET /api/videos?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:06:03] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fkuimou%2Fannotations.jsonl HTTP/1.1" 200 -
+[02/Apr/2026 00:06:03] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:06:04] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:06:04] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000a3525-6c98-4650-aaab-be7d2c7b9402.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:06:04] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:06:04] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:05] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:06:05] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:06:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=775 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:05] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:06:05] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:06:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:05] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:06:05] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:06:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:05] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:06:05] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:06:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:05] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:06:05] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:06:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:06:18] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:06:33] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:06:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:06:48] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:07:03] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000cd456-ff8d-499b-b0c1-4acead128a8b.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:07:14] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:14] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=1302
+[02/Apr/2026 00:07:14] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 bytes=1302 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:14] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:14] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=8079656
+[02/Apr/2026 00:07:18] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:07:24] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=8079656 elapsed_ms=9943.8 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:27] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:27] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=8079656
+[02/Apr/2026 00:07:33] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:07:36] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=4325376 elapsed_ms=9704.0 detail=mode=full outcome=client_disconnected
+[02/Apr/2026 00:07:39] "GET / HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "GET /styles.css HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "GET /app.js HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "GET /api/config HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "GET /api/videos?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:07:39] "GET /api/annotations?path=%2Fhome%2Fubuntu%2FUMR_DATA%2Fdata%2Fkuimou%2Fannotations.jsonl HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000786a7-3f9d-4fe6-bfb3-045b368f7d44.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:07:40] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:40] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:07:40] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/init.mp4 bytes=775 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:40] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:40] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:40] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:40] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:40] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:41] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:41] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:41] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:41] "GET /hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:41] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:41] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/0849822fb54f77f35d3b82117443577099fcd62f/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000a3525-6c98-4650-aaab-be7d2c7b9402.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=775
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/init.mp4 bytes=775 elapsed_ms=0.2 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:49] "GET /hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:49] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=24
+[02/Apr/2026 00:07:49] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/01a905a45d9e3f1a2cb3c2d7a4ef607a8a11de56/seg_00000.m4s bytes=24 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:54] "POST /api/video-release HTTP/1.1" 200 -
+[02/Apr/2026 00:07:54] "POST /api/video-claim HTTP/1.1" 200 -
+[02/Apr/2026 00:07:54] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8?path=/data/UMRM/data/EGO/videos/full_scale/000cd456-ff8d-499b-b0c1-4acead128a8b.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:54] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=0 elapsed_ms=0.0 detail=mode=full size=222
+[02/Apr/2026 00:07:54] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/index.m3u8 bytes=222 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:54] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 HTTP/1.1" 200 -
+[02/Apr/2026 00:07:54] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 bytes=0 elapsed_ms=0.0 detail=mode=full size=1302
+[02/Apr/2026 00:07:54] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/init.mp4 bytes=1302 elapsed_ms=0.1 detail=mode=full outcome=completed
+[02/Apr/2026 00:07:54] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:07:54] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=8079656
+[02/Apr/2026 00:07:54] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:08:05] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=8079656 elapsed_ms=11232.4 detail=mode=full outcome=completed
+[02/Apr/2026 00:08:07] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:08:07] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=8079656
+[02/Apr/2026 00:08:09] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:08:21] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=8079656 elapsed_ms=13706.2 detail=mode=full outcome=completed
+[02/Apr/2026 00:08:21] "GET /hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s HTTP/1.1" 200 -
+[02/Apr/2026 00:08:21] [video-transfer] start channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=0 elapsed_ms=0.0 detail=mode=full size=8079656
+[02/Apr/2026 00:08:24] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:08:35] [video-transfer] end channel=hls client=218.107.35.216 file=/home/ubuntu/UMR_DATA/preview_cache/hls/9f42f3cfddc8070a644880215d1d188b63994e0a/seg_00000.m4s bytes=8079656 elapsed_ms=13858.4 detail=mode=full outcome=completed
+[02/Apr/2026 00:08:39] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:08:47] "GET /api/video-statuses?root=%2Fhome%2Fubuntu%2FUMRM%2Fdata%2Fvideos HTTP/1.1" 200 -
+[02/Apr/2026 00:08:54] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:09:09] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -
+[02/Apr/2026 00:09:24] "GET /api/video-statuses?root=%2Fdata%2FUMRM%2Fdata%2FEGO%2Fvideos%2Ffull_scale HTTP/1.1" 200 -

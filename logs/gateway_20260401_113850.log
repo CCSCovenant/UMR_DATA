@@ -1,0 +1,22 @@
+nohup: ignoring input
+[01/Apr/2026 11:38:51] "POST /api/video-claim HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1651, in do_POST
+    result = claim_video(video_path, video_relative_path, annotator_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/UMR_DATA/server.py", line 343, in claim_video
+    raise ValueError(f"该视频已被 {current_owner} 领取，请稍后重试。")
+ValueError: 该视频已被 ann_user_1 领取，请稍后重试。
+[01/Apr/2026 11:38:52] "POST /api/video-claim HTTP/1.1" 400 -
+Traceback (most recent call last):
+  File "/home/ubuntu/UMR_DATA/server.py", line 1634, in do_POST
+    update_video_status(video_path, VIDEO_STATUS_COMPLETED_UNVERIFIED, annotator_id)
+  File "/home/ubuntu/UMR_DATA/server.py", line 405, in update_video_status
+    raise ValueError("仅领取者可将 claimed 更新为 completed_unverified。")
+ValueError: 仅领取者可将 claimed 更新为 completed_unverified。
+[01/Apr/2026 11:38:52] "POST /api/annotations HTTP/1.1" 400 -
+[01/Apr/2026 11:38:52] "POST /api/annotations HTTP/1.1" 200 -
+[01/Apr/2026 11:38:52] "POST /api/video-status HTTP/1.1" 200 -
+[01/Apr/2026 11:38:58] "GET /api/videos?root=/tmp HTTP/1.1" 200 -
+[01/Apr/2026 11:39:32] "GET /api/videos?root=/tmp HTTP/1.1" 200 -
+[01/Apr/2026 11:39:41] "GET /api/videos?root=/tmp HTTP/1.1" 200 -
